@@ -2,6 +2,8 @@
 // Created by Sippawit Thammawiset on 25/1/2024 AD.
 //
 
+// TODO: Add documentation
+
 #ifndef PSO_H
 #define PSO_H
 
@@ -11,6 +13,12 @@
 #include <cmath>
 
 #define CLAMP(X, MIN, MAX)        std::max(MIN, std::min(MAX, X))
+
+enum
+{
+    FAILED = 0,
+    OK = 1
+};
 
 namespace Optimizer
 {
@@ -37,37 +45,36 @@ namespace Optimizer
     public:
         APSO (const std::vector<double>& LowerBound, const std::vector<double>& UpperBound,
               int MaxIteration, int NPopulation, int NVariable,
-              double Phi = 2.05f, double VelocityFactor = 0.5f) :
+              double Phi = 2.05f, double VelocityFactor = 0.5f,
+              bool Log = true) :
               LowerBound_(LowerBound),
               UpperBound_(UpperBound),
               MaxIteration_(MaxIteration),
               NPopulation_(NPopulation),
               NVariable_(NVariable),
               Phi_(Phi),
-              VelocityFactor_(VelocityFactor)
+              VelocityFactor_(VelocityFactor),
+              Log_(Log)
         {
 
         }
 
         ~APSO () = default;
 
-        static double FitnessFunction (const std::vector<double> &Position)
+        void SetFitnessFunction (double (*UserFitnessFunction)(const std::vector<double> &Position))
         {
-            double X1 = Position[0];
-            double X2 = Position[1];
-
-//            return X1 * X2;
-//            return X1 * X1 + X2 * X2;
-//            return pow(X1 - 3.14f, 2) + pow(X2 - 2.72f, 2) + sin(3 * X1 + 1.41f) + sin(4 * X2 - 1.73f);
-
-            double Term1 = 100.0f * sqrtf(fabs(X2 - (0.01f * X1 * X1)));
-            double Term2 = 0.01f * fabs(X1 + 10.0f);
-
-            return Term1 + Term2;
+            this->FitnessFunction = UserFitnessFunction;
         }
 
         bool Run ()
         {
+            if (FitnessFunction == nullptr)
+            {
+                std::cerr << "Fitness function is not defined. Please use SetFitnessFunction(UserFitnessFunction) before calling Run()." << std::endl;
+
+                return FAILED;
+            }
+
             // Initialize
             this->Population_ = std::vector<AParticle> (NPopulation_);
 
@@ -128,12 +135,15 @@ namespace Optimizer
                     Optimize(CurrentPopulation, PopulationIndex);
                 }
 
-                std::cout << "[INFO] Iteration: " << Iteration << " >>> " << "Best fitness value: " << this->GlobalBestFitnessValue_ << std::endl;
+                if (this->Log_)
+                {
+                    std::cout << "[INFO] Iteration: " << Iteration << " >>> " << "Best fitness value: " << this->GlobalBestFitnessValue_ << std::endl;
+                }
             }
 
             std::cout << "[INFO] Completed." << std::endl;
 
-            return true;
+            return OK;
         }
 
         void Optimize (AParticle *CurrentPopulation, int PopulationIndex)
@@ -230,12 +240,16 @@ namespace Optimizer
         double Phi_, W_{}, CMax_{};
         double VelocityFactor_;
 
+        double (*FitnessFunction)(const std::vector<double> &Position);
+
         std::vector<AParticle> Population_;
         std::vector<double> MinimumVelocity_, MaximumVelocity_;
 
         std::vector<double> GlobalBestPosition_;
         double GlobalBestFitnessValue_ = INFINITY;
         int GlobalBestIndex_{};
+
+        bool Log_;
     };
 }
 

@@ -2,29 +2,22 @@
 
 #include "PSO.h"
 
-double GetMean (const std::vector<double> &Sample)
+double GetMean (const std::vector<double> &Sample);
+double GetVariance (const std::vector<double> &Sample);
+
+double FitnessFunction (const std::vector<double> &Position)
 {
-    double Sum = 0.0f;
+    double X1 = Position[0];
+    double X2 = Position[1];
 
-    for (const auto &i : Sample)
-    {
-        Sum += i;
-    }
+//    return X1 * X2;
+//    return X1 * X1 + X2 * X2;
+//    return pow(X1 - 3.14f, 2) + pow(X2 - 2.72f, 2) + sin(3 * X1 + 1.41f) + sin(4 * X2 - 1.73f);
 
-    return Sum / (double)Sample.size();
-}
+    double Term1 = 100.0f * sqrtf(fabs(X2 - (0.01f * X1 * X1)));
+    double Term2 = 0.01f * fabs(X1 + 10.0f);
 
-double GetVariance (const std::vector<double> &Sample)
-{
-    double Mean = GetMean(Sample);
-    double Variance = 0.0f;
-
-    for (const auto &i : Sample)
-    {
-        Variance += powf(i - Mean, 2);
-    }
-
-    return Variance / ((double)Sample.size() - 1);
+    return Term1 + Term2;
 }
 
 int main() {
@@ -50,7 +43,10 @@ int main() {
 
         Optimizer::APSO PSO(LowerBound, UpperBound,
                             MaxIteration, NPopulation, NVariable,
-                            Phi, VelocityFactor);
+                            Phi, VelocityFactor,
+                            false);
+
+        PSO.SetFitnessFunction(FitnessFunction);
 
         if (PSO.Run())
         {
@@ -72,6 +68,10 @@ int main() {
 
             Sample.push_back(GlobalBestFitnessValue);
         }
+        else
+        {
+            break;
+        }
 
         std::cout << "------------------------" << std::endl;
     }
@@ -84,4 +84,29 @@ int main() {
     std::cout << "Variance: " << GetVariance(Sample) << std::endl;
 
     return 0;
+}
+
+double GetMean (const std::vector<double> &Sample)
+{
+    double Sum = 0.0f;
+
+    for (const auto &i : Sample)
+    {
+        Sum += i;
+    }
+
+    return Sum / (double)Sample.size();
+}
+
+double GetVariance (const std::vector<double> &Sample)
+{
+    double Mean = GetMean(Sample);
+    double Variance = 0.0f;
+
+    for (const auto &i : Sample)
+    {
+        Variance += powf(i - Mean, 2);
+    }
+
+    return Variance / ((double)Sample.size() - 1);
 }
