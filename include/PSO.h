@@ -76,7 +76,7 @@ namespace Optimizer
             }
 
             // Initialize
-            this->Population_ = std::vector<AParticle> (NPopulation_);
+            this->Population_ = std::vector<AParticle> (this->NPopulation_);
 
             this->MaximumVelocity_ = std::vector<double> (this->NVariable_);
             this->MinimumVelocity_ = std::vector<double> (this->NVariable_);
@@ -202,6 +202,9 @@ namespace Optimizer
                 UpdatedVelocity[VariableIndex] = NewVelocity;
             }
 
+            CurrentPopulation->Position = UpdatedPosition;
+            CurrentPopulation->Velocity = UpdatedVelocity;
+
             // Evaluate Fitness Value
             double FitnessValue = FitnessFunction(CurrentPopulation->Position);
 
@@ -219,9 +222,6 @@ namespace Optimizer
                 this->GlobalBestFitnessValue_ = FitnessValue;
                 this->GlobalBestIndex_ = PopulationIndex;
             }
-
-            CurrentPopulation->Position = UpdatedPosition;
-            CurrentPopulation->Velocity = UpdatedVelocity;
         }
 
         std::vector<double> GetGlobalBestPosition ()

@@ -14,15 +14,17 @@ double FitnessFunction (const std::vector<double> &Position)
 //    return X1 * X1 + X2 * X2;
 //    return pow(X1 - 3.14f, 2) + pow(X2 - 2.72f, 2) + sin(3 * X1 + 1.41f) + sin(4 * X2 - 1.73f);
 
-    double Term1 = 100.0f * sqrtf(fabs(X2 - (0.01f * X1 * X1)));
-    double Term2 = 0.01f * fabs(X1 + 10.0f);
+    return 2.0f * X1 * X1 - 1.05f * pow(X1, 4) + pow(X1, 6) / 6 + X1 * X2 + X2 * X2;
 
-    return Term1 + Term2;
+//    double Term1 = 100.0f * sqrtf(fabs(X2 - (0.01f * X1 * X1)));
+//    double Term2 = 0.01f * fabs(X1 + 10.0f);
+
+//    return Term1 + Term2;
 }
 
 int main() {
-    std::vector<double> LowerBound = {-15, -3};
-    std::vector<double> UpperBound = {-5, 3};
+    std::vector<double> LowerBound = {-5, -5};
+    std::vector<double> UpperBound = {5, 5};
 
     int NRun = 30;
 
