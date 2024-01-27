@@ -18,7 +18,7 @@ enum
 {
     FAILED = 0,
     OK = 1
-};
+} Status;
 
 namespace Optimizer
 {
@@ -240,10 +240,10 @@ namespace Optimizer
         double Phi_, W_{}, CMax_{};
         double VelocityFactor_;
 
-        double (*FitnessFunction)(const std::vector<double> &Position);
+        double (*FitnessFunction)(const std::vector<double> &Position) = nullptr;
 
         std::vector<AParticle> Population_;
-        std::vector<double> MinimumVelocity_, MaximumVelocity_;
+        std::vector<double> MaximumVelocity_, MinimumVelocity_;
 
         std::vector<double> GlobalBestPosition_;
         double GlobalBestFitnessValue_ = INFINITY;
@@ -251,6 +251,6 @@ namespace Optimizer
 
         bool Log_;
     };
-}
+} // Optimizer
 
 #endif // PSO_H
