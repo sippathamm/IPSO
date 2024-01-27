@@ -18,7 +18,7 @@ enum
 {
     FAILED = 0,
     OK = 1
-} Status;
+};
 
 namespace Optimizer
 {
@@ -45,14 +45,17 @@ namespace Optimizer
     public:
         APSO (const std::vector<double>& LowerBound, const std::vector<double>& UpperBound,
               int MaxIteration, int NPopulation, int NVariable,
-              double Phi = 2.05f, double VelocityFactor = 0.5f,
+              double InertialWeight, double SocialCoefficient, double CognitiveCoefficient,
+              double VelocityFactor = 0.5f,
               bool Log = true) :
               LowerBound_(LowerBound),
               UpperBound_(UpperBound),
               MaxIteration_(MaxIteration),
               NPopulation_(NPopulation),
               NVariable_(NVariable),
-              Phi_(Phi),
+              InertialWeight_(InertialWeight),
+              SocialCoefficient_(SocialCoefficient),
+              CognitiveCoefficient_(CognitiveCoefficient),
               VelocityFactor_(VelocityFactor),
               Log_(Log)
         {
@@ -66,6 +69,27 @@ namespace Optimizer
             this->FitnessFunction = UserFitnessFunction;
         }
 
+        double UpdateVelocity (const AParticle *CurrentPopulation, int VariableIndex)
+        {
+            double NewVelocity =
+                    this->InertialWeight_ * CurrentPopulation->Velocity[VariableIndex] +
+                    this->SocialCoefficient_ * GenerateRandom(0.0f, 1.0f) * (CurrentPopulation->BestPosition[VariableIndex] - CurrentPopulation->Position[VariableIndex])+
+                    this->CognitiveCoefficient_ * GenerateRandom(0.0f, 1.0f) * (this->GlobalBestPosition_[VariableIndex] - CurrentPopulation->Position[VariableIndex]);
+
+            NewVelocity = CLAMP(NewVelocity, this->MinimumVelocity_[VariableIndex], this->MaximumVelocity_[VariableIndex]);
+
+            return NewVelocity;
+        }
+
+        double UpdatePosition (const AParticle *CurrentPopulation, int VariableIndex)
+        {
+            double NewPosition = CurrentPopulation->Position[VariableIndex] + CurrentPopulation->Velocity[VariableIndex];
+
+            NewPosition = CLAMP(NewPosition, this->LowerBound_[VariableIndex], this->UpperBound_[VariableIndex]);
+
+            return NewPosition;
+        }
+
         bool Run ()
         {
             if (FitnessFunction == nullptr)
@@ -75,14 +99,18 @@ namespace Optimizer
                 return FAILED;
             }
 
+            if (this->LowerBound_.size() != NVariable_ || this->UpperBound_.size() != NVariable_)
+            {
+                std::cerr << "Size of lowerbound or upperbound does not match with number of variables." << std::endl;
+
+                return FAILED;
+            }
+
             // Initialize
             this->Population_ = std::vector<AParticle> (this->NPopulation_);
 
             this->MaximumVelocity_ = std::vector<double> (this->NVariable_);
             this->MinimumVelocity_ = std::vector<double> (this->NVariable_);
-
-            this->W_ = 1.0f / (this->Phi_ - 1.0f + sqrt(this->Phi_ * this->Phi_ - 2.0f * this->Phi_));
-            this->CMax_ = this->W_ * this->Phi_;
 
             for (int VariableIndex = 0; VariableIndex < this->NVariable_; VariableIndex++)
             {
@@ -100,8 +128,7 @@ namespace Optimizer
                 for (int VariableIndex = 0; VariableIndex < this->NVariable_; VariableIndex++)
                 {
                     double RandomPosition = GenerateRandom(this->LowerBound_[VariableIndex], this->UpperBound_[VariableIndex]);
-                    double RandomVelocity = (this->LowerBound_[VariableIndex] - RandomPosition) +
-                                            GenerateRandom(0.0f, 1.0f) * (this->UpperBound_[VariableIndex] - this->LowerBound_[VariableIndex]);
+                    double RandomVelocity = GenerateRandom(0.0f, 1.0f);
 
                     RandomVelocity = CLAMP(RandomVelocity, this->MinimumVelocity_[VariableIndex], this->MaximumVelocity_[VariableIndex]);
 
@@ -121,7 +148,6 @@ namespace Optimizer
                 {
                     this->GlobalBestPosition_ = CurrentPopulation->Position;
                     this->GlobalBestFitnessValue_ = FitnessValue;
-                    this->GlobalBestIndex_ = PopulationIndex;
                 }
             }
             
@@ -132,7 +158,7 @@ namespace Optimizer
                 {
                     auto *CurrentPopulation = &this->Population_[PopulationIndex];
 
-                    Optimize(CurrentPopulation, PopulationIndex);
+                    Optimize(CurrentPopulation);
                 }
 
                 if (this->Log_)
@@ -146,64 +172,21 @@ namespace Optimizer
             return OK;
         }
 
-        void Optimize (AParticle *CurrentPopulation, int PopulationIndex)
+        void Optimize (AParticle *CurrentPopulation)
         {
-            std::vector<double> UpdatedPosition(this->NVariable_);
-            std::vector<double> UpdatedVelocity(this->NVariable_);
-
-            double Radius = 0.0f;
-            double Norm = 0.0f;
-            std::vector<double> SphereCenter(this->NVariable_);
-            std::vector<double> Random(this->NVariable_);
-
-            // Hypersphere
             for (int VariableIndex = 0; VariableIndex < this->NVariable_; VariableIndex++)
             {
-                double Gr = CurrentPopulation->Position[VariableIndex] + (1.0f / 3.0f) * this->CMax_ *
-                            (CurrentPopulation->BestPosition[VariableIndex] +
-                            this->GlobalBestPosition_[VariableIndex] - 2.0f * CurrentPopulation->Position[VariableIndex]) *
-                            (PopulationIndex == this->GlobalBestIndex_ ? 0.75f : 1.0f);
-
-                SphereCenter[VariableIndex] = Gr;
-
-                Radius += powf(Gr - CurrentPopulation->Position[VariableIndex], 2);
-
-                Random[VariableIndex] = GenerateRandom(0.0f, 1.0f);
-                Norm += Random[VariableIndex] * Random[VariableIndex];
-            }
-
-            double MaximumRadius = sqrt(Radius);
-            Norm = sqrt(Norm);
-
-            for (int VariableIndex = 0; VariableIndex < this->NVariable_; VariableIndex++)
-            {
-                double XSphere = Random[VariableIndex] * (GenerateRandom(0.0f, MaximumRadius) / Norm);
-
                 // Update Velocity
-                double NewVelocity = this->W_ * CurrentPopulation->Velocity[VariableIndex] +
-                                     SphereCenter[VariableIndex] + XSphere - CurrentPopulation->Position[VariableIndex];
-
-                NewVelocity = CLAMP(NewVelocity, this->MinimumVelocity_[VariableIndex], this->MaximumVelocity_[VariableIndex]);
-
-                // Temporary Update Position
-                double NewPosition = CurrentPopulation->Position[VariableIndex] + NewVelocity;
-
-                if (NewPosition < this->LowerBound_[VariableIndex] || NewPosition > this->UpperBound_[VariableIndex])
-                {
-                    NewVelocity = -GenerateRandom(0.0f, 1.0f) * NewVelocity;
-                }
-
-                // Update Position
-                NewPosition = CurrentPopulation->Position[VariableIndex] + NewVelocity;
-
-                NewPosition = CLAMP(NewPosition, this->LowerBound_[VariableIndex], this->UpperBound_[VariableIndex]);
-
-                UpdatedPosition[VariableIndex] = NewPosition;
-                UpdatedVelocity[VariableIndex] = NewVelocity;
+                double NewVelocity = UpdateVelocity(CurrentPopulation, VariableIndex);
+                CurrentPopulation->Velocity[VariableIndex] = NewVelocity;
             }
 
-            CurrentPopulation->Position = UpdatedPosition;
-            CurrentPopulation->Velocity = UpdatedVelocity;
+            for (int VariableIndex = 0; VariableIndex < this->NVariable_; VariableIndex++)
+            {
+                // Update Position
+                double NewPosition = UpdatePosition(CurrentPopulation, VariableIndex);
+                CurrentPopulation->Position[VariableIndex] = NewPosition;
+            }
 
             // Evaluate Fitness Value
             double FitnessValue = FitnessFunction(CurrentPopulation->Position);
@@ -220,7 +203,6 @@ namespace Optimizer
             {
                 this->GlobalBestPosition_ = CurrentPopulation->Position;
                 this->GlobalBestFitnessValue_ = FitnessValue;
-                this->GlobalBestIndex_ = PopulationIndex;
             }
         }
 
@@ -237,7 +219,7 @@ namespace Optimizer
     private:
         std::vector<double> LowerBound_, UpperBound_;
         int MaxIteration_, NPopulation_, NVariable_;
-        double Phi_, W_{}, CMax_{};
+        double InertialWeight_, SocialCoefficient_, CognitiveCoefficient_;
         double VelocityFactor_;
 
         double (*FitnessFunction)(const std::vector<double> &Position) = nullptr;
@@ -247,7 +229,6 @@ namespace Optimizer
 
         std::vector<double> GlobalBestPosition_;
         double GlobalBestFitnessValue_ = INFINITY;
-        int GlobalBestIndex_{};
 
         bool Log_;
     };
