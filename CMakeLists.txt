@@ -8,4 +8,5 @@ include_directories(include)
 add_executable(PSO
         example/FindGlobalMinimum.cpp
         include/PSO.h
+        include/BenchmarkFunction.h
 )

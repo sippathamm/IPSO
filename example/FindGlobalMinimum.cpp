@@ -1,6 +1,26 @@
+//
+// Created by Sippawit Thammawiset on 25/1/2024 AD.
+//
+
+/* TODO:    - Add a convenience way to test benchmark function
+ */
+
 #include <iostream>
 
 #include "PSO.h"
+#include "BenchmarkFunction.h"
+
+//#define SPHERE
+//#define SCHWEFEL_S_2_22
+//#define SCHWEFEL_S_1_20
+//#define ROSENBROCK
+#define STEP
+//#define QUARTIC_NOISE
+
+//#define SCHWEFEL_S_2_26
+//#define RASTRIGIN
+//#define ACKLEY
+//#define GRIEWANK
 
 double GetMean (const std::vector<double> &Sample);
 double GetVariance (const std::vector<double> &Sample);
@@ -9,36 +29,167 @@ double FitnessFunction (const std::vector<double> &Position)
 {
     // Define your fitness function here
 
-    double X1 = Position[0];
-    double X2 = Position[1];
+#ifdef SPHERE
 
-//    return X1 * X2;
-//    return X1 * X1 + X2 * X2;
-//    return pow(X1 - 3.14f, 2) + pow(X2 - 2.72f, 2) + sin(3 * X1 + 1.41f) + sin(4 * X2 - 1.73f);
+    return Benchmark::Function::Sphere(Position);
 
-//    return 2.0f * X1 * X1 - 1.05f * pow(X1, 4) + pow(X1, 6) / 6 + X1 * X2 + X2 * X2;
+#endif // SPHERE
 
-    double Term1 = 100.0f * sqrtf(fabs(X2 - (0.01f * X1 * X1)));
-    double Term2 = 0.01f * fabs(X1 + 10.0f);
+#ifdef SCHWEFEL_S_2_22
 
-    return Term1 + Term2;
+    return Benchmark::Function::Schwefel_s_2_22(Position);
+
+#endif // SCHWEFEL_S_2_22
+
+#ifdef SCHWEFEL_S_1_20
+
+    return Benchmark::Function::Schwefel_s_1_20(Position);
+
+#endif // SCHWEFEL_S_1_20
+
+#ifdef ROSENBROCK
+
+    return Benchmark::Function::Rosenbrock(Position);
+
+#endif // ROSENBROCK
+
+#ifdef STEP
+
+    return Benchmark::Function::Step(Position);
+
+#endif // STEP
+
+#ifdef QUARTIC_NOISE
+    
+    return Benchmark::Function::QuarticNoise(Position);
+
+#endif // QUARTIC_NOISE
+
+#ifdef SCHWEFEL_S_2_26
+
+    return Benchmark::Function::Schwefel_s_2_26(Position);
+
+#endif // SCHWEFEL_S_2_26
+
+#ifdef RASTRIGIN
+
+    return Benchmark::Function::Rastrigin(Position);
+
+#endif // RASTRIGIN
+
+#ifdef ACKLEY
+
+    return Benchmark::Function::Ackley(Position);
+
+#endif // ACKLEY
+
+#ifdef GRIEWANK
+
+    return Benchmark::Function::Griewank(Position);
+
+#endif // GRIEWANK
 }
 
 int main() {
+    std::vector<double> LowerBound, UpperBound;
+
+    int MaximumIteration, NPopulation, NVariable;
+    double SocialCoefficient, CognitiveCoefficient;
+    double VelocityFactor;
+
+#ifdef SPHERE
+
+    Benchmark::Condition::Sphere(LowerBound, UpperBound,
+                                 MaximumIteration, NPopulation, NVariable,
+                                 SocialCoefficient, CognitiveCoefficient,
+                                 VelocityFactor);
+
+#endif // SPHERE
+
+#ifdef SCHWEFEL_S_2_22
+
+    Benchmark::Condition::Schwefel_s_2_22(LowerBound, UpperBound,
+                                          MaximumIteration, NPopulation, NVariable,
+                                          SocialCoefficient, CognitiveCoefficient,
+                                          VelocityFactor);
+
+#endif // SCHWEFEL_S_2_22
+
+#ifdef SCHWEFEL_S_1_20
+
+    Benchmark::Condition::Schwefel_s_1_20(LowerBound, UpperBound,
+                                          MaximumIteration, NPopulation, NVariable,
+                                          SocialCoefficient, CognitiveCoefficient,
+                                          VelocityFactor);
+
+#endif // SCHWEFEL_S_1_20
+
+#ifdef ROSENBROCK
+
+    Benchmark::Condition::Rosenbrock(LowerBound, UpperBound,
+                                     MaximumIteration, NPopulation, NVariable,
+                                     SocialCoefficient, CognitiveCoefficient,
+                                     VelocityFactor);
+
+#endif // ROSENBROCK
+
+#ifdef STEP
+
+    Benchmark::Condition::Step(LowerBound, UpperBound,
+                               MaximumIteration, NPopulation, NVariable,
+                               SocialCoefficient, CognitiveCoefficient,
+                               VelocityFactor);
+
+#endif // STEP
+
+#ifdef QUARTIC_NOISE
+
+    Benchmark::Condition::QuarticNoise(LowerBound, UpperBound,
+                                       MaximumIteration, NPopulation, NVariable,
+                                       SocialCoefficient, CognitiveCoefficient,
+                                       VelocityFactor);
+
+#endif // QUARTIC_NOISE
+
+#ifdef SCHWEFEL_S_2_26
+
+    Benchmark::Condition::Schwefel_s_2_26(LowerBound, UpperBound,
+                                          MaximumIteration, NPopulation, NVariable,
+                                          SocialCoefficient, CognitiveCoefficient,
+                                          VelocityFactor);
+
+#endif // SCHWEFEL_S_2_26
+
+#ifdef RASTRIGIN
+
+    Benchmark::Condition::Rastrigin(LowerBound, UpperBound,
+                                    MaximumIteration, NPopulation, NVariable,
+                                    SocialCoefficient, CognitiveCoefficient,
+                                    VelocityFactor);
+
+#endif // RASTRIGIN
+
+#ifdef ACKLEY
+
+    Benchmark::Condition::Ackley(LowerBound, UpperBound,
+                                 MaximumIteration, NPopulation, NVariable,
+                                 SocialCoefficient, CognitiveCoefficient,
+                                 VelocityFactor);
+
+#endif // ACKLEY
+
+#ifdef GRIEWANK
+
+    Benchmark::Condition::Griewank(LowerBound, UpperBound,
+                                   MaximumIteration, NPopulation, NVariable,
+                                   SocialCoefficient, CognitiveCoefficient,
+                                   VelocityFactor);
+
+#endif // GRIEWANK
+
     int NRun = 30;
 
-    int MaxIteration = 1000;
-    int NPopulation = 50;
-    int NVariable = 2;
-
-    std::vector<double> LowerBound = {-15, -3};
-    std::vector<double> UpperBound = {-5, 3};
-
-    double InertialWeight = 0.9f;
-    double SocialCoefficient = 0.2f;
-    double CognitiveCoefficient = 0.3f;
-    double VelocityFactor = 0.5f;
-
+    // Store the result
     double Maximum = -INFINITY;
     double Minimum = INFINITY;
     std::vector<double> Sample;
@@ -48,8 +199,8 @@ int main() {
         std::cout << "Run:\t" << Run << std::endl;
 
         Optimizer::APSO PSO(LowerBound, UpperBound,
-                            MaxIteration, NPopulation, NVariable,
-                            InertialWeight, SocialCoefficient, CognitiveCoefficient,
+                            MaximumIteration, NPopulation, NVariable,
+                            SocialCoefficient, CognitiveCoefficient,
                             VelocityFactor,
                             false);
 
@@ -83,12 +234,16 @@ int main() {
         std::cout << "------------------------" << std::endl;
     }
 
-    std::cout << "Result" << std::endl;
+    std::cout << "Benchmark Result" << std::endl;
+
+    double Mean = GetMean(Sample);
+    double Variance = GetVariance(Sample);
+    double SD = sqrtf(Variance);
 
     std::cout << "Maximum:\t" << Maximum << std::endl;
     std::cout << "Minimum:\t" << Minimum << std::endl;
-    std::cout << "Mean:\t" << GetMean(Sample) << std::endl;
-    std::cout << "Variance:\t" << GetVariance(Sample) << std::endl;
+    std::cout << "Mean:\t" << Mean << std::endl;
+    std::cout << "SD:\t" << SD << std::endl;
 
     return 0;
 }
