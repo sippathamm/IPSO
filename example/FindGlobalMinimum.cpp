@@ -2,9 +2,6 @@
 // Created by Sippawit Thammawiset on 25/1/2024 AD.
 //
 
-/* TODO:    - Add a convenience way to test benchmark function
- */
-
 #include <iostream>
 
 #include "PSO.h"
@@ -17,30 +14,28 @@ double FitnessFunction (const std::vector<double> &Position)
 {
     // Define your fitness function here
 
-    return Benchmark::BenchmarkFunction(SPHERE, Position);
+    return Benchmark::BenchmarkFunction(Benchmark::RASTRIGIN, Position);
 }
 
 int main() {
     std::vector<double> LowerBound, UpperBound;
 
     int MaximumIteration, NPopulation, NVariable;
-    double SocialCoefficient, CognitiveCoefficient;
-    double VelocityFactor;
+    double SocialCoefficient = 1.5f, CognitiveCoefficient = 1.5f;
+    double VelocityFactor = 0.5f;
 
-    Benchmark::BenchmarkCondition(SPHERE,
+    Benchmark::BenchmarkCondition(Benchmark::RASTRIGIN,
                                   LowerBound, UpperBound,
-                                  MaximumIteration, NPopulation, NVariable,
-                                  SocialCoefficient, CognitiveCoefficient,
-                                  VelocityFactor);
+                                  MaximumIteration, NPopulation, NVariable);
 
     int NRun = 30;
 
-    // Store the result
+    // Save the results
     double Maximum = -INFINITY;
     double Minimum = INFINITY;
     std::vector<double> Sample;
 
-    for (int Run = 0; Run < NRun; Run++)
+    for (int Run = 1; Run <= NRun; Run++)
     {
         std::cout << "Run:\t" << Run << std::endl;
 
@@ -85,11 +80,6 @@ int main() {
     double Mean = GetMean(Sample);
     double Variance = GetVariance(Sample);
     double SD = sqrtf(Variance);
-
-    for (const double &i : Sample)
-    {
-        std::cout << i << std::endl;
-    }
 
     std::cout << "Maximum:\t" << Maximum << std::endl;
     std::cout << "Minimum:\t" << Minimum << std::endl;

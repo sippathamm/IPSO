@@ -17,14 +17,14 @@
 #define CLAMP(X, MIN, MAX)                      std::max(MIN, std::min(MAX, X))
 #define IS_OUT_OF_BOUND(X, MIN, MAX)            X < MIN || X > MAX
 
-enum
-{
-    FAILED = 0,
-    OK = 1
-};
-
 namespace Optimizer
 {
+    enum
+    {
+        FAILED = 0,
+        SUCCESS = 1
+    };
+
     double GenerateRandom (double LowerBound = 0.0f, double UpperBound = 1.0f)
     {
         std::random_device Engine;
@@ -193,7 +193,7 @@ namespace Optimizer
 
             std::cout << "[INFO] Completed." << std::endl;
 
-            return OK;
+            return SUCCESS;
         }
 
         void CalculateAdaptiveInertialWeight (AParticle *CurrentPopulation)

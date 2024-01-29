@@ -5,22 +5,24 @@
 #ifndef BENCHMARK_FUNCTION_H
 #define BENCHMARK_FUNCTION_H
 
-enum
-{
-    SPHERE = 0,
-    SCHWEFEL_S_2_22 = 1,
-    SCHWEFEL_S_1_20 = 2,
-    ROSENBROCK = 3,
-    STEP = 4,
-    QUARTIC_NOISE = 5,
-    SCHWEFEL_S_2_26 = 6,
-    RASTRIGIN = 7,
-    ACKLEY = 8,
-    GRIEWANK = 9
-};
-
 namespace Benchmark
 {
+    typedef int FUNCTION_TYPE;
+
+    enum
+    {
+        SPHERE = 0,
+        SCHWEFEL_S_2_22 = 1,
+        SCHWEFEL_S_1_20 = 2,
+        ROSENBROCK = 3,
+        STEP = 4,
+        QUARTIC_NOISE = 5,
+        SCHWEFEL_S_2_26 = 6,
+        RASTRIGIN = 7,
+        ACKLEY = 8,
+        GRIEWANK = 9
+    };
+
     namespace Function
     {
         double Sphere (const std::vector<double> &Position)
@@ -163,7 +165,130 @@ namespace Benchmark
         }
     } // Benchmark::Function
 
-    double BenchmarkFunction (int FUNCTION, const std::vector<double> &Position)
+    namespace Condition
+    {
+        void Sphere(std::vector<double> &LowerBound,
+                    std::vector<double> &UpperBound,
+                    int &MaximumIteration, int &NPopulation, int &NVariable)
+        {
+            MaximumIteration = 1000;
+            NPopulation = 50;
+            NVariable = 30;
+
+            LowerBound = std::vector<double>(NVariable, -100);
+            UpperBound = std::vector<double>(NVariable, 100);
+        }
+
+        void Schwefel_s_2_22(std::vector<double> &LowerBound,
+                             std::vector<double> &UpperBound,
+                             int &MaximumIteration, int &NPopulation, int &NVariable)
+        {
+            MaximumIteration = 1000;
+            NPopulation = 50;
+            NVariable = 30;
+
+            LowerBound = std::vector<double>(NVariable, -10);
+            UpperBound = std::vector<double>(NVariable, 10);
+        }
+
+        void Schwefel_s_1_20(std::vector<double> &LowerBound,
+                             std::vector<double> &UpperBound,
+                             int &MaximumIteration, int &NPopulation, int &NVariable)
+        {
+            MaximumIteration = 1000;
+            NPopulation = 50;
+            NVariable = 30;
+
+            LowerBound = std::vector<double>(NVariable, -100);
+            UpperBound = std::vector<double>(NVariable, 100);
+        }
+
+        void Rosenbrock(std::vector<double> &LowerBound,
+                        std::vector<double> &UpperBound,
+                        int &MaximumIteration, int &NPopulation, int &NVariable)
+        {
+            MaximumIteration = 1000;
+            NPopulation = 50;
+            NVariable = 30;
+
+            LowerBound = std::vector<double>(NVariable, -30);
+            UpperBound = std::vector<double>(NVariable, 30);
+        }
+
+        void Step(std::vector<double> &LowerBound,
+                  std::vector<double> &UpperBound,
+                  int &MaximumIteration, int &NPopulation, int &NVariable)
+        {
+            MaximumIteration = 1000;
+            NPopulation = 50;
+            NVariable = 30;
+
+            LowerBound = std::vector<double>(NVariable, -100);
+            UpperBound = std::vector<double>(NVariable, 100);
+        }
+
+        void QuarticNoise(std::vector<double> &LowerBound,
+                          std::vector<double> &UpperBound,
+                          int &MaximumIteration, int &NPopulation, int &NVariable)
+        {
+            MaximumIteration = 1000;
+            NPopulation = 50;
+            NVariable = 30;
+
+            LowerBound = std::vector<double>(NVariable, -1.28f);
+            UpperBound = std::vector<double>(NVariable, 1.28f);
+        }
+
+        void Schwefel_s_2_26(std::vector<double> &LowerBound,
+                             std::vector<double> &UpperBound,
+                             int &MaximumIteration, int &NPopulation, int &NVariable)
+        {
+            MaximumIteration = 1000;
+            NPopulation = 50;
+            NVariable = 30;
+
+            LowerBound = std::vector<double>(NVariable, -500);
+            UpperBound = std::vector<double>(NVariable, 500);
+        }
+
+        void Rastrigin(std::vector<double> &LowerBound,
+                       std::vector<double> &UpperBound,
+                       int &MaximumIteration, int &NPopulation, int &NVariable)
+        {
+            MaximumIteration = 1000;
+            NPopulation = 50;
+            NVariable = 30;
+
+            LowerBound = std::vector<double>(NVariable, -5.12f);
+            UpperBound = std::vector<double>(NVariable, 5.12f);
+        }
+
+        void Ackley(std::vector<double> &LowerBound,
+                    std::vector<double> &UpperBound,
+                    int &MaximumIteration, int &NPopulation, int &NVariable)
+        {
+            MaximumIteration = 1000;
+            NPopulation = 50;
+            NVariable = 30;
+
+            LowerBound = std::vector<double>(NVariable, -32);
+            UpperBound = std::vector<double>(NVariable, 32);
+        }
+
+        void Griewank(std::vector<double> &LowerBound,
+                      std::vector<double> &UpperBound,
+                      int &MaximumIteration, int &NPopulation, int &NVariable)
+        {
+            MaximumIteration = 1000;
+            NPopulation = 50;
+            NVariable = 30;
+
+            LowerBound = std::vector<double>(NVariable, -600);
+            UpperBound = std::vector<double>(NVariable, 600);
+        }
+    } // Benchmark::Condition
+
+    double BenchmarkFunction (FUNCTION_TYPE FUNCTION, const std::vector<double> &Position)
     {
         switch (FUNCTION)
         {
@@ -194,270 +319,49 @@ namespace Benchmark
 
         return -1;
     }
-}
 
-namespace Benchmark
-{
-    namespace Condition
-    {
-        void Sphere(std::vector<double> &LowerBound,
-                    std::vector<double> &UpperBound,
-                    int &MaximumIteration, int &NPopulation, int &NVariable,
-                    double &SocialCoefficient, double &CognitiveCoefficient,
-                    double &VelocityFactor) {
-            MaximumIteration = 1000;
-            NPopulation = 50;
-
-            NVariable = 30;
-
-            LowerBound = std::vector<double>(NVariable, -100);
-            UpperBound = std::vector<double>(NVariable, 100);
-
-            SocialCoefficient = 1.5f;
-            CognitiveCoefficient = 1.5f;
-            VelocityFactor = 0.5f;
-        }
-
-        void Schwefel_s_2_22(std::vector<double> &LowerBound,
-                             std::vector<double> &UpperBound,
-                             int &MaximumIteration, int &NPopulation, int &NVariable,
-                             double &SocialCoefficient, double &CognitiveCoefficient,
-                             double &VelocityFactor) {
-            MaximumIteration = 1000;
-            NPopulation = 50;
-
-            NVariable = 30;
-
-            LowerBound = std::vector<double>(NVariable, -10);
-            UpperBound = std::vector<double>(NVariable, 10);
-
-            SocialCoefficient = 1.5f;
-            CognitiveCoefficient = 1.5f;
-            VelocityFactor = 0.5f;
-        }
-
-        void Schwefel_s_1_20(std::vector<double> &LowerBound,
-                             std::vector<double> &UpperBound,
-                             int &MaximumIteration, int &NPopulation, int &NVariable,
-                             double &SocialCoefficient, double &CognitiveCoefficient,
-                             double &VelocityFactor) {
-            MaximumIteration = 1000;
-            NPopulation = 50;
-
-            NVariable = 30;
-
-            LowerBound = std::vector<double>(NVariable, -100);
-            UpperBound = std::vector<double>(NVariable, 100);
-
-            SocialCoefficient = 1.5f;
-            CognitiveCoefficient = 1.5f;
-            VelocityFactor = 0.5f;
-        }
-
-        void Rosenbrock(std::vector<double> &LowerBound,
-                        std::vector<double> &UpperBound,
-                        int &MaximumIteration, int &NPopulation, int &NVariable,
-                        double &SocialCoefficient, double &CognitiveCoefficient,
-                        double &VelocityFactor) {
-            MaximumIteration = 1000;
-            NPopulation = 50;
-
-            NVariable = 30;
-
-            LowerBound = std::vector<double>(NVariable, -30);
-            UpperBound = std::vector<double>(NVariable, 30);
-
-            SocialCoefficient = 1.5f;
-            CognitiveCoefficient = 1.5f;
-            VelocityFactor = 0.5f;
-        }
-
-        void Step(std::vector<double> &LowerBound,
-                  std::vector<double> &UpperBound,
-                  int &MaximumIteration, int &NPopulation, int &NVariable,
-                  double &SocialCoefficient, double &CognitiveCoefficient,
-                  double &VelocityFactor) {
-            MaximumIteration = 1000;
-            NPopulation = 50;
-
-            NVariable = 30;
-
-            LowerBound = std::vector<double>(NVariable, -100);
-            UpperBound = std::vector<double>(NVariable, 100);
-
-            SocialCoefficient = 1.5f;
-            CognitiveCoefficient = 1.5f;
-            VelocityFactor = 0.5f;
-        }
-
-        void QuarticNoise(std::vector<double> &LowerBound,
-                          std::vector<double> &UpperBound,
-                          int &MaximumIteration, int &NPopulation, int &NVariable,
-                          double &SocialCoefficient, double &CognitiveCoefficient,
-                          double &VelocityFactor) {
-            MaximumIteration = 1000;
-            NPopulation = 50;
-
-            NVariable = 30;
-
-            LowerBound = std::vector<double>(NVariable, -1.28f);
-            UpperBound = std::vector<double>(NVariable, 1.28f);
-
-            SocialCoefficient = 1.5f;
-            CognitiveCoefficient = 1.5f;
-            VelocityFactor = 0.5f;
-        }
-
-        void Schwefel_s_2_26(std::vector<double> &LowerBound,
-                             std::vector<double> &UpperBound,
-                             int &MaximumIteration, int &NPopulation, int &NVariable,
-                             double &SocialCoefficient, double &CognitiveCoefficient,
-                             double &VelocityFactor) {
-            MaximumIteration = 1000;
-            NPopulation = 50;
-
-            NVariable = 30;
-
-            LowerBound = std::vector<double>(NVariable, -500);
-            UpperBound = std::vector<double>(NVariable, 500);
-
-            SocialCoefficient = 1.5f;
-            CognitiveCoefficient = 1.5f;
-            VelocityFactor = 0.5f;
-        }
-
-        void Rastrigin(std::vector<double> &LowerBound,
-                       std::vector<double> &UpperBound,
-                       int &MaximumIteration, int &NPopulation, int &NVariable,
-                       double &SocialCoefficient, double &CognitiveCoefficient,
-                       double &VelocityFactor) {
-            MaximumIteration = 1000;
-            NPopulation = 50;
-
-            NVariable = 30;
-
-            LowerBound = std::vector<double>(NVariable, -5.12f);
-            UpperBound = std::vector<double>(NVariable, 5.12f);
-
-            SocialCoefficient = 1.5f;
-            CognitiveCoefficient = 1.5f;
-            VelocityFactor = 0.5f;
-        }
-
-        void Ackley(std::vector<double> &LowerBound,
-                    std::vector<double> &UpperBound,
-                    int &MaximumIteration, int &NPopulation, int &NVariable,
-                    double &SocialCoefficient, double &CognitiveCoefficient,
-                    double &VelocityFactor) {
-            MaximumIteration = 1000;
-            NPopulation = 50;
-
-            NVariable = 30;
-
-            LowerBound = std::vector<double>(NVariable, -32);
-            UpperBound = std::vector<double>(NVariable, 32);
-
-            SocialCoefficient = 1.5f;
-            CognitiveCoefficient = 1.5f;
-            VelocityFactor = 0.5f;
-        }
-
-        void Griewank(std::vector<double> &LowerBound,
-                      std::vector<double> &UpperBound,
-                      int &MaximumIteration, int &NPopulation, int &NVariable,
-                      double &SocialCoefficient, double &CognitiveCoefficient,
-                      double &VelocityFactor) {
-            MaximumIteration = 1000;
-            NPopulation = 50;
-
-            NVariable = 30;
-
-            LowerBound = std::vector<double>(NVariable, -600);
-            UpperBound = std::vector<double>(NVariable, 600);
-
-            SocialCoefficient = 1.5f;
-            CognitiveCoefficient = 1.5f;
-            VelocityFactor = 0.5f;
-        }
-    }
-
-    void BenchmarkCondition(int FUNCTION,
-                            std::vector<double> &LowerBound,
-                            std::vector<double> &UpperBound,
-                            int &MaximumIteration, int &NPopulation, int &NVariable,
-                            double &SocialCoefficient, double &CognitiveCoefficient,
-                            double &VelocityFactor)
+    void BenchmarkCondition(FUNCTION_TYPE FUNCTION,
+                            std::vector<double> &LowerBound, std::vector<double> &UpperBound,
+                            int &MaximumIteration, int &NPopulation, int &NVariable)
     {
         switch (FUNCTION)
         {
             case SPHERE:
-                return Condition::Sphere(LowerBound,
-                                         UpperBound,
-                                         MaximumIteration, NPopulation, NVariable,
-                                         SocialCoefficient, CognitiveCoefficient,
-                                         VelocityFactor);
+                Condition::Sphere(LowerBound,UpperBound,
+                                  MaximumIteration, NPopulation, NVariable);
             case SCHWEFEL_S_2_22:
-                return Condition::Schwefel_s_2_22(LowerBound,
-                                                  UpperBound,
-                                                  MaximumIteration, NPopulation, NVariable,
-                                                  SocialCoefficient, CognitiveCoefficient,
-                                                  VelocityFactor);
+                Condition::Schwefel_s_2_22(LowerBound,UpperBound,
+                                           MaximumIteration, NPopulation, NVariable);
             case SCHWEFEL_S_1_20:
-                return Condition::Schwefel_s_1_20(LowerBound,
-                                                  UpperBound,
-                                                  MaximumIteration, NPopulation, NVariable,
-                                                  SocialCoefficient, CognitiveCoefficient,
-                                                  VelocityFactor);
+                Condition::Schwefel_s_1_20(LowerBound,UpperBound,
+                                           MaximumIteration, NPopulation, NVariable);
             case ROSENBROCK:
-                return Condition::Rosenbrock(LowerBound,
-                                             UpperBound,
-                                             MaximumIteration, NPopulation, NVariable,
-                                             SocialCoefficient, CognitiveCoefficient,
-                                             VelocityFactor);
+                Condition::Rosenbrock(LowerBound,UpperBound,
+                                      MaximumIteration, NPopulation, NVariable);
             case STEP:
-                return Condition::Step(LowerBound,
-                                       UpperBound,
-                                       MaximumIteration, NPopulation, NVariable,
-                                       SocialCoefficient, CognitiveCoefficient,
-                                       VelocityFactor);
+                Condition::Step(LowerBound,UpperBound,
+                                MaximumIteration, NPopulation, NVariable);
             case QUARTIC_NOISE:
-                return Condition::QuarticNoise(LowerBound,
-                                               UpperBound,
-                                               MaximumIteration, NPopulation, NVariable,
-                                               SocialCoefficient, CognitiveCoefficient,
-                                               VelocityFactor);
+                Condition::QuarticNoise(LowerBound,UpperBound,
+                                        MaximumIteration, NPopulation, NVariable);
             case SCHWEFEL_S_2_26:
-                return Condition::Schwefel_s_2_26(LowerBound,
-                                                  UpperBound,
-                                                  MaximumIteration, NPopulation, NVariable,
-                                                  SocialCoefficient, CognitiveCoefficient,
-                                                  VelocityFactor);
+                Condition::Schwefel_s_2_26(LowerBound,UpperBound,
+                                           MaximumIteration, NPopulation, NVariable);
             case RASTRIGIN:
-                return Condition::Rastrigin(LowerBound,
-                                            UpperBound,
-                                            MaximumIteration, NPopulation, NVariable,
-                                            SocialCoefficient, CognitiveCoefficient,
-                                            VelocityFactor);
+                Condition::Rastrigin(LowerBound,UpperBound,
+                                     MaximumIteration, NPopulation, NVariable);
             case ACKLEY:
-                return Condition::Ackley(LowerBound,
-                                         UpperBound,
-                                         MaximumIteration, NPopulation, NVariable,
-                                         SocialCoefficient, CognitiveCoefficient,
-                                         VelocityFactor);
+                Condition::Ackley(LowerBound,UpperBound,
+                                  MaximumIteration, NPopulation, NVariable);
             case GRIEWANK:
-                return Condition::Griewank(LowerBound,
-                                           UpperBound,
-                                           MaximumIteration, NPopulation, NVariable,
-                                           SocialCoefficient, CognitiveCoefficient,
-                                           VelocityFactor);
+                Condition::Griewank(LowerBound,UpperBound,
+                                    MaximumIteration, NPopulation, NVariable);
+
             default:
-                return Condition::Sphere(LowerBound,
-                                         UpperBound,
-                                         MaximumIteration, NPopulation, NVariable,
-                                         SocialCoefficient, CognitiveCoefficient,
-                                         VelocityFactor);
+                Condition::Sphere(LowerBound,UpperBound,
+                                  MaximumIteration, NPopulation, NVariable);
         }
     }
-} // Benchmark::Condition
+}
 
 #endif //BENCHMARK_FUNCTION_H
