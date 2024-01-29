@@ -329,33 +329,43 @@ namespace Benchmark
             case SPHERE:
                 Condition::Sphere(LowerBound,UpperBound,
                                   MaximumIteration, NPopulation, NVariable);
+                break;
             case SCHWEFEL_S_2_22:
                 Condition::Schwefel_s_2_22(LowerBound,UpperBound,
                                            MaximumIteration, NPopulation, NVariable);
+                break;
             case SCHWEFEL_S_1_20:
                 Condition::Schwefel_s_1_20(LowerBound,UpperBound,
                                            MaximumIteration, NPopulation, NVariable);
+                break;
             case ROSENBROCK:
                 Condition::Rosenbrock(LowerBound,UpperBound,
                                       MaximumIteration, NPopulation, NVariable);
+                break;
             case STEP:
                 Condition::Step(LowerBound,UpperBound,
                                 MaximumIteration, NPopulation, NVariable);
+                break;
             case QUARTIC_NOISE:
                 Condition::QuarticNoise(LowerBound,UpperBound,
                                         MaximumIteration, NPopulation, NVariable);
+                break;
             case SCHWEFEL_S_2_26:
                 Condition::Schwefel_s_2_26(LowerBound,UpperBound,
                                            MaximumIteration, NPopulation, NVariable);
+                break;
             case RASTRIGIN:
                 Condition::Rastrigin(LowerBound,UpperBound,
                                      MaximumIteration, NPopulation, NVariable);
+                break;
             case ACKLEY:
                 Condition::Ackley(LowerBound,UpperBound,
                                   MaximumIteration, NPopulation, NVariable);
+                break;
             case GRIEWANK:
                 Condition::Griewank(LowerBound,UpperBound,
                                     MaximumIteration, NPopulation, NVariable);
+                break;
 
             default:
                 Condition::Sphere(LowerBound,UpperBound,
