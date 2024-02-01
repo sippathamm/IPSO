@@ -139,7 +139,6 @@ namespace Optimizer
                 std::vector<double> Position(this->NVariable_);
                 std::vector<double> Velocity(this->NVariable_);
 
-
                 for (int VariableIndex = 0; VariableIndex < this->NVariable_; VariableIndex++)
                 {
                     double RandomPosition = GenerateRandom(this->LowerBound_[VariableIndex], this->UpperBound_[VariableIndex]);
@@ -222,8 +221,6 @@ namespace Optimizer
                 CurrentPopulation->Velocity[VariableIndex] = NewVelocity;
             }
 
-            auto PreviousPosition = CurrentPopulation->Position;
-
             // Update Position
             for (int VariableIndex = 0; VariableIndex < this->NVariable_; VariableIndex++)
             {
@@ -248,7 +245,7 @@ namespace Optimizer
                 for (int VariableIndex = 0; VariableIndex < this->NVariable_; VariableIndex++)
                 {
                     CurrentPopulation->Feedback[VariableIndex] = (1.0f / static_cast<double>(Iteration + 1)) * CurrentPopulation->Feedback[VariableIndex] +
-                                                                 (CurrentPopulation->Position[VariableIndex] - PreviousPosition[VariableIndex]) *
+                                                                 (CurrentPopulation->Velocity[VariableIndex]) *
                                                                  GenerateRandom(0.0f, 1.0f);
                 }
             }
@@ -257,7 +254,7 @@ namespace Optimizer
                 for (int VariableIndex = 0; VariableIndex < this->NVariable_; VariableIndex++)
                 {
                     CurrentPopulation->Feedback[VariableIndex] = (1.0f / static_cast<double>(Iteration + 1)) * CurrentPopulation->Feedback[VariableIndex] -
-                                                                 (CurrentPopulation->Position[VariableIndex] - PreviousPosition[VariableIndex]) *
+                                                                 (CurrentPopulation->Velocity[VariableIndex]) *
                                                                  GenerateRandom(0.0f, 1.0f);
                 }
             }
@@ -270,7 +267,7 @@ namespace Optimizer
             }
         }
 
-        std::vector<double> GetGlobalBestPosition ()
+        std::vector<double> GetGlobalBestPosition () const
         {
             return this->GlobalBestPosition_;
         }

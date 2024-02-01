@@ -2,6 +2,9 @@
 // Created by Sippawit Thammawiset on 29/1/2024 AD.
 //
 
+/* TODO:    Add documentation
+ */
+
 #ifndef BENCHMARK_FUNCTION_H
 #define BENCHMARK_FUNCTION_H
 
