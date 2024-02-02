@@ -79,7 +79,7 @@ int main() {
 
     double Mean = GetMean(Sample);
     double Variance = GetVariance(Sample);
-    double SD = sqrtf(Variance);
+    double SD = sqrt(Variance);
 
     std::cout << "Maximum:\t" << Maximum << std::endl;
     std::cout << "Minimum:\t" << Minimum << std::endl;
@@ -108,7 +108,7 @@ double GetVariance (const std::vector<double> &Sample)
 
     for (const auto &i : Sample)
     {
-        Variance += powf(i - Mean, 2);
+        Variance += pow(i - Mean, 2);
     }
 
     return Variance / ((double)Sample.size() - 1);

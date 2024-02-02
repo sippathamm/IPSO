@@ -2,7 +2,7 @@
 // Created by Sippawit Thammawiset on 25/1/2024 AD.
 //
 
-/* TODO:    - Add documentation
+/* TODO:    - Add comments and documentation
  *          - Add more velocity confinements
  */
 
@@ -171,7 +171,7 @@ namespace Optimizer
             this->AverageFitnessValue_ /= this->NPopulation_;
 
             // Optimize
-            for (int Iteration = 0; Iteration < this->MaximumIteration_; Iteration++)
+            for (int Iteration = 1; Iteration <= this->MaximumIteration_; Iteration++)
             {
                 for (int PopulationIndex = 0; PopulationIndex < this->NPopulation_; PopulationIndex++)
                 {
@@ -244,7 +244,7 @@ namespace Optimizer
                 // This kind of awful!
                 for (int VariableIndex = 0; VariableIndex < this->NVariable_; VariableIndex++)
                 {
-                    CurrentPopulation->Feedback[VariableIndex] = (1.0f / static_cast<double>(Iteration + 1)) * CurrentPopulation->Feedback[VariableIndex] +
+                    CurrentPopulation->Feedback[VariableIndex] = (1.0f / static_cast<double>(Iteration)) * CurrentPopulation->Feedback[VariableIndex] +
                                                                  (CurrentPopulation->Velocity[VariableIndex]) *
                                                                  GenerateRandom(0.0f, 1.0f);
                 }
@@ -253,7 +253,7 @@ namespace Optimizer
             {
                 for (int VariableIndex = 0; VariableIndex < this->NVariable_; VariableIndex++)
                 {
-                    CurrentPopulation->Feedback[VariableIndex] = (1.0f / static_cast<double>(Iteration + 1)) * CurrentPopulation->Feedback[VariableIndex] -
+                    CurrentPopulation->Feedback[VariableIndex] = (1.0f / static_cast<double>(Iteration)) * CurrentPopulation->Feedback[VariableIndex] -
                                                                  (CurrentPopulation->Velocity[VariableIndex]) *
                                                                  GenerateRandom(0.0f, 1.0f);
                 }
