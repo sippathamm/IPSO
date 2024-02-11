@@ -75,36 +75,6 @@ namespace Optimizer
             this->FitnessFunction_ = UserFitnessFunction;
         }
 
-        double UpdateVelocity (const AParticle *CurrentPopulation, int VariableIndex)
-        {
-            double NewVelocity = this->InertialWeight_ * CurrentPopulation->Velocity[VariableIndex] +
-                                 this->SocialCoefficient_ * GenerateRandom(0.0f, 1.0f) * (CurrentPopulation->BestPosition[VariableIndex] - CurrentPopulation->Position[VariableIndex])+
-                                 this->CognitiveCoefficient_ * GenerateRandom(0.0f, 1.0f) * (this->GlobalBestPosition_[VariableIndex] - CurrentPopulation->Position[VariableIndex]) +
-                                 CurrentPopulation->Feedback[VariableIndex];
-
-            NewVelocity = CLAMP(NewVelocity, this->MinimumVelocity_[VariableIndex], this->MaximumVelocity_[VariableIndex]);
-
-            return NewVelocity;
-        }
-
-        double UpdatePosition (AParticle *CurrentPopulation, int VariableIndex)
-        {
-            double TemporaryNewPosition = CurrentPopulation->Position[VariableIndex] + CurrentPopulation->Velocity[VariableIndex];
-
-            if (IS_OUT_OF_BOUND(TemporaryNewPosition, this->LowerBound_[VariableIndex], this->UpperBound_[VariableIndex]))
-            {
-                double VelocityConfinement = -GenerateRandom(0.0f, 1.0f) * CurrentPopulation->Velocity[VariableIndex];
-
-                CurrentPopulation->Velocity[VariableIndex] = VelocityConfinement;
-            }
-
-            double NewPosition = CurrentPopulation->Position[VariableIndex] + CurrentPopulation->Velocity[VariableIndex];
-
-            NewPosition = CLAMP(NewPosition, this->LowerBound_[VariableIndex], this->UpperBound_[VariableIndex]);
-
-            return NewPosition;
-        }
-
         bool Run ()
         {
             if (FitnessFunction_ == nullptr)
@@ -196,17 +166,47 @@ namespace Optimizer
             return SUCCESS;
         }
 
+        std::vector<double> GetGlobalBestPosition () const
+        {
+            return this->GlobalBestPosition_;
+        }
+
+        double GetGlobalBestFitnessValue () const
+        {
+            return this->GlobalBestFitnessValue_;
+        }
+
+    private:
+        std::vector<double> LowerBound_, UpperBound_;
+        int MaximumIteration_, NPopulation_, NVariable_;
+        double InertialWeight_{}, SocialCoefficient_, CognitiveCoefficient_;
+        double MaximumInertialWeight_ = 0.9f, MinimumInertialWeight_ = 0.4;
+        double VelocityFactor_;
+
+        double (*FitnessFunction_)(const std::vector<double> &Position) = nullptr;
+
+        std::vector<AParticle> Population_;
+        std::vector<double> MaximumVelocity_, MinimumVelocity_;
+
+        std::vector<double> GlobalBestPosition_;
+        double GlobalBestFitnessValue_ = INFINITY;
+        double AverageFitnessValue_ = 0.0f;
+        double NextAverageFitnessValue_ = 0.0f;
+
+        bool Log_;
+
+
         void CalculateAdaptiveInertialWeight (AParticle *CurrentPopulation)
         {
             if (CurrentPopulation->FitnessValue <= this->AverageFitnessValue_)
             {
                 this->InertialWeight_ = this->MinimumInertialWeight_ + (this->MaximumInertialWeight_ - this->MinimumInertialWeight_) *
-                                        ((CurrentPopulation->FitnessValue - this->GlobalBestFitnessValue_) / (this->AverageFitnessValue_ - this->GlobalBestFitnessValue_));
+                                                                       ((CurrentPopulation->FitnessValue - this->GlobalBestFitnessValue_) / (this->AverageFitnessValue_ - this->GlobalBestFitnessValue_));
             }
             else
             {
                 this->InertialWeight_ = this->MinimumInertialWeight_ + (this->MaximumInertialWeight_ - this->MinimumInertialWeight_) *
-                                        ((this->AverageFitnessValue_ - this->GlobalBestFitnessValue_) / (CurrentPopulation->FitnessValue - this->GlobalBestFitnessValue_));
+                                                                       ((this->AverageFitnessValue_ - this->GlobalBestFitnessValue_) / (CurrentPopulation->FitnessValue - this->GlobalBestFitnessValue_));
             }
         }
 
@@ -268,34 +268,36 @@ namespace Optimizer
             }
         }
 
-        std::vector<double> GetGlobalBestPosition () const
+
+        double UpdateVelocity (const AParticle *CurrentPopulation, int VariableIndex)
         {
-            return this->GlobalBestPosition_;
+            double NewVelocity = this->InertialWeight_ * CurrentPopulation->Velocity[VariableIndex] +
+                                 this->SocialCoefficient_ * GenerateRandom(0.0f, 1.0f) * (CurrentPopulation->BestPosition[VariableIndex] - CurrentPopulation->Position[VariableIndex])+
+                                 this->CognitiveCoefficient_ * GenerateRandom(0.0f, 1.0f) * (this->GlobalBestPosition_[VariableIndex] - CurrentPopulation->Position[VariableIndex]) +
+                                 CurrentPopulation->Feedback[VariableIndex];
+
+            NewVelocity = CLAMP(NewVelocity, this->MinimumVelocity_[VariableIndex], this->MaximumVelocity_[VariableIndex]);
+
+            return NewVelocity;
         }
 
-        double GetGlobalBestFitnessValue () const
+        double UpdatePosition (AParticle *CurrentPopulation, int VariableIndex)
         {
-            return this->GlobalBestFitnessValue_;
+            double TemporaryNewPosition = CurrentPopulation->Position[VariableIndex] + CurrentPopulation->Velocity[VariableIndex];
+
+            if (IS_OUT_OF_BOUND(TemporaryNewPosition, this->LowerBound_[VariableIndex], this->UpperBound_[VariableIndex]))
+            {
+                double VelocityConfinement = -GenerateRandom(0.0f, 1.0f) * CurrentPopulation->Velocity[VariableIndex];
+
+                CurrentPopulation->Velocity[VariableIndex] = VelocityConfinement;
+            }
+
+            double NewPosition = CurrentPopulation->Position[VariableIndex] + CurrentPopulation->Velocity[VariableIndex];
+
+            NewPosition = CLAMP(NewPosition, this->LowerBound_[VariableIndex], this->UpperBound_[VariableIndex]);
+
+            return NewPosition;
         }
-
-    private:
-        std::vector<double> LowerBound_, UpperBound_;
-        int MaximumIteration_, NPopulation_, NVariable_;
-        double InertialWeight_{}, SocialCoefficient_, CognitiveCoefficient_;
-        double MaximumInertialWeight_ = 0.9f, MinimumInertialWeight_ = 0.4;
-        double VelocityFactor_;
-
-        double (*FitnessFunction_)(const std::vector<double> &Position) = nullptr;
-
-        std::vector<AParticle> Population_;
-        std::vector<double> MaximumVelocity_, MinimumVelocity_;
-
-        std::vector<double> GlobalBestPosition_;
-        double GlobalBestFitnessValue_ = INFINITY;
-        double AverageFitnessValue_ = 0.0f;
-        double NextAverageFitnessValue_ = 0.0f;
-
-        bool Log_;
     };
 } // Optimizer
 
