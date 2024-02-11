@@ -35,14 +35,14 @@ namespace Optimizer
 
     typedef struct AParticle
     {
-        AParticle () : BestFitnessValue(INFINITY), FitnessValue(0.0f) {}
+        AParticle () : BestCost(INFINITY), Cost(0.0f) {}
 
         std::vector<double> Position;
         std::vector<double> Velocity;
-        double FitnessValue;
+        double Cost;
 
         std::vector<double> BestPosition;
-        double BestFitnessValue;
+        double BestCost;
 
         std::vector<double> Feedback;
     } AParticle;
@@ -123,23 +123,23 @@ namespace Optimizer
                 CurrentPopulation->Position = Position;
                 CurrentPopulation->Velocity = Velocity;
 
-                double FitnessValue = FitnessFunction_(CurrentPopulation->Position);
-                CurrentPopulation->FitnessValue = FitnessValue;
+                double Cost = FitnessFunction_(CurrentPopulation->Position);
+                CurrentPopulation->Cost = Cost;
                 
-                this->AverageFitnessValue_ += FitnessValue;
+                this->AverageCost_ += Cost;
 
                 CurrentPopulation->BestPosition = CurrentPopulation->Position;
-                CurrentPopulation->BestFitnessValue = FitnessValue;
+                CurrentPopulation->BestCost = Cost;
                 CurrentPopulation->Feedback = std::vector<double> (this->NVariable_);
 
-                if (FitnessValue < this->GlobalBestFitnessValue_)
+                if (Cost < this->GlobalBestCost_)
                 {
                     this->GlobalBestPosition_ = CurrentPopulation->Position;
-                    this->GlobalBestFitnessValue_ = FitnessValue;
+                    this->GlobalBestCost_ = Cost;
                 }
             }
 
-            this->AverageFitnessValue_ /= this->NPopulation_;
+            this->AverageCost_ /= this->NPopulation_;
 
             // Optimize
             for (int Iteration = 1; Iteration <= this->MaximumIteration_; Iteration++)
@@ -151,13 +151,14 @@ namespace Optimizer
                     Optimize(Iteration, CurrentPopulation);
                 }
 
-                this->NextAverageFitnessValue_ /= this->NPopulation_;
-                this->AverageFitnessValue_ = this->NextAverageFitnessValue_;
-                this->NextAverageFitnessValue_ = 0.0f;
+                this->NextAverageCost_ /= this->NPopulation_;
+                this->AverageCost_ = this->NextAverageCost_;
+                this->NextAverageCost_ = 0.0f;
 
                 if (this->Log_)
                 {
-                    std::cout << "[INFO] Iteration: " << Iteration << " >>> " << "Best fitness value: " << this->GlobalBestFitnessValue_ << std::endl;
+                    std::cout << "[INFO] Iteration: " << Iteration << " >>> "
+                              << "Best Cost: " << this->GlobalBestCost_ << std::endl;
                 }
             }
 
@@ -171,9 +172,9 @@ namespace Optimizer
             return this->GlobalBestPosition_;
         }
 
-        double GetGlobalBestFitnessValue () const
+        double GetGlobalBestCost () const
         {
-            return this->GlobalBestFitnessValue_;
+            return this->GlobalBestCost_;
         }
 
     private:
@@ -189,24 +190,24 @@ namespace Optimizer
         std::vector<double> MaximumVelocity_, MinimumVelocity_;
 
         std::vector<double> GlobalBestPosition_;
-        double GlobalBestFitnessValue_ = INFINITY;
-        double AverageFitnessValue_ = 0.0f;
-        double NextAverageFitnessValue_ = 0.0f;
+        double GlobalBestCost_ = INFINITY;
+        double AverageCost_ = 0.0f;
+        double NextAverageCost_ = 0.0f;
 
         bool Log_;
 
 
         void CalculateAdaptiveInertialWeight (AParticle *CurrentPopulation)
         {
-            if (CurrentPopulation->FitnessValue <= this->AverageFitnessValue_)
+            if (CurrentPopulation->Cost <= this->AverageCost_)
             {
                 this->InertialWeight_ = this->MinimumInertialWeight_ + (this->MaximumInertialWeight_ - this->MinimumInertialWeight_) *
-                                                                       ((CurrentPopulation->FitnessValue - this->GlobalBestFitnessValue_) / (this->AverageFitnessValue_ - this->GlobalBestFitnessValue_));
+                                        ((CurrentPopulation->Cost - this->GlobalBestCost_) / (this->AverageCost_ - this->GlobalBestCost_));
             }
             else
             {
                 this->InertialWeight_ = this->MinimumInertialWeight_ + (this->MaximumInertialWeight_ - this->MinimumInertialWeight_) *
-                                                                       ((this->AverageFitnessValue_ - this->GlobalBestFitnessValue_) / (CurrentPopulation->FitnessValue - this->GlobalBestFitnessValue_));
+                                        ((this->AverageCost_ - this->GlobalBestCost_) / (CurrentPopulation->Cost - this->GlobalBestCost_));
             }
         }
 
@@ -231,16 +232,16 @@ namespace Optimizer
             }
 
             // Evaluate Fitness Value
-            double FitnessValue = FitnessFunction_(CurrentPopulation->Position);
-            CurrentPopulation->FitnessValue = FitnessValue;
+            double Cost = FitnessFunction_(CurrentPopulation->Position);
+            CurrentPopulation->Cost = Cost;
 
-            this->NextAverageFitnessValue_ += FitnessValue;
+            this->NextAverageCost_ += Cost;
 
             // Update Previous Best
-            if (FitnessValue < CurrentPopulation->BestFitnessValue)
+            if (Cost < CurrentPopulation->BestCost)
             {
                 CurrentPopulation->BestPosition = CurrentPopulation->Position;
-                CurrentPopulation->BestFitnessValue = FitnessValue;
+                CurrentPopulation->BestCost = Cost;
 
                 // This kind of awful!
                 for (int VariableIndex = 0; VariableIndex < this->NVariable_; VariableIndex++)
@@ -261,10 +262,10 @@ namespace Optimizer
             }
 
             // Update Global Best
-            if (FitnessValue < this->GlobalBestFitnessValue_)
+            if (Cost < this->GlobalBestCost_)
             {
                 this->GlobalBestPosition_ = CurrentPopulation->Position;
-                this->GlobalBestFitnessValue_ = FitnessValue;
+                this->GlobalBestCost_ = Cost;
             }
         }
 

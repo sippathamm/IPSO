@@ -58,9 +58,9 @@ int main() {
             }
             std::cout << std::endl;
 
-            double GlobalBestFitnessValue = PSO.GetGlobalBestFitnessValue();
+            double GlobalBestFitnessValue = PSO.GetGlobalBestCost();
 
-            std::cout << "Global Best Fitness Value:\t" << GlobalBestFitnessValue << std::endl;
+            std::cout << "Global Best Cost:\t" << GlobalBestFitnessValue << std::endl;
 
             Maximum = std::max(Maximum, GlobalBestFitnessValue);
             Minimum = std::min(Minimum, GlobalBestFitnessValue);
