@@ -14,7 +14,7 @@ double FitnessFunction (const std::vector<double> &Position)
 {
     // Define your fitness function here
 
-    return Benchmark::BenchmarkFunction(Benchmark::SCHWEFEL_S_2_26, Position);
+    return Benchmark::BenchmarkFunction(Benchmark::SPHERE, Position);
 }
 
 int main() {
@@ -24,7 +24,7 @@ int main() {
     double SocialCoefficient = 1.5f, CognitiveCoefficient = 1.5f;
     double VelocityFactor = 0.5f;
 
-    Benchmark::BenchmarkCondition(Benchmark::SCHWEFEL_S_2_26,
+    Benchmark::BenchmarkCondition(Benchmark::SPHERE,
                                   LowerBound, UpperBound,
                                   MaximumIteration, NPopulation, NVariable);
 

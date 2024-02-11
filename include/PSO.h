@@ -4,6 +4,7 @@
 
 /* TODO:    - Add comments and documentation
  *          - Add more velocity confinements
+ *          - Use vector push_back()
  */
 
 #ifndef PSO_H
