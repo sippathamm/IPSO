@@ -34,7 +34,7 @@ namespace Optimizer
 
     typedef struct AParticle
     {
-        AParticle () : BestCost(INFINITY), Cost(0.0f) {}
+        AParticle () : Cost(0.0f), BestCost(INFINITY) {}
 
         std::vector<double> Position;
         std::vector<double> Velocity;
