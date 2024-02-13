@@ -4,15 +4,15 @@
 
 #include <iostream>
 
-#include "PSO.h"
 #include "BenchmarkFunction.h"
+#include "PSO.h"
 
 double GetMean (const std::vector<double> &Sample);
 double GetVariance (const std::vector<double> &Sample);
 
-double FitnessFunction (const std::vector<double> &Position)
+double ObjectiveFunction (const std::vector<double> &Position)
 {
-    // Define your fitness function here
+    // Define your objective function here
 
     return Benchmark::BenchmarkFunction(Benchmark::SPHERE, Position);
 }
@@ -45,7 +45,7 @@ int main() {
                             VelocityFactor,
                             false);
 
-        PSO.SetFitnessFunction(FitnessFunction);
+        PSO.SetObjectiveFunction(ObjectiveFunction);
 
         if (PSO.Run())
         {
@@ -58,14 +58,14 @@ int main() {
             }
             std::cout << std::endl;
 
-            double GlobalBestFitnessValue = PSO.GetGlobalBestCost();
+            double GlobalBestCost = PSO.GetGlobalBestCost();
 
-            std::cout << "Global Best Cost:\t" << GlobalBestFitnessValue << std::endl;
+            std::cout << "Global Best Cost:\t" << GlobalBestCost << std::endl;
 
-            Maximum = std::max(Maximum, GlobalBestFitnessValue);
-            Minimum = std::min(Minimum, GlobalBestFitnessValue);
+            Maximum = std::max(Maximum, GlobalBestCost);
+            Minimum = std::min(Minimum, GlobalBestCost);
 
-            Sample.push_back(GlobalBestFitnessValue);
+            Sample.push_back(GlobalBestCost);
         }
         else
         {

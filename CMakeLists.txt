@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 include_directories(include)
 
 add_executable(PSO
-        example/FindGlobalMinimum.cpp
         include/PSO.h
         include/BenchmarkFunction.h
+        example/FindGlobalMinimum.cpp
 )

@@ -4,7 +4,6 @@
 
 /* TODO:    - Add comments and documentation
  *          - Add more velocity confinements
- *          - Use vector push_back()
  */
 
 #ifndef PSO_H
@@ -70,16 +69,16 @@ namespace Optimizer
 
         ~APSO () = default;
 
-        void SetFitnessFunction (double (*UserFitnessFunction)(const std::vector<double> &Position))
+        void SetObjectiveFunction (double (*UserObjectiveFunction)(const std::vector<double> &Position))
         {
-            this->FitnessFunction_ = UserFitnessFunction;
+            this->ObjectiveFunction_ = UserObjectiveFunction;
         }
 
         bool Run ()
         {
-            if (FitnessFunction_ == nullptr)
+            if (ObjectiveFunction_ == nullptr)
             {
-                std::cerr << "Fitness function is not defined. Please use SetFitnessFunction(UserFitnessFunction) before calling Run()." << std::endl;
+                std::cerr << "Objective function is not defined. Please use SetObjectiveFunction(UserObjectiveFunction) before calling Run()." << std::endl;
 
                 return FAILED;
             }
@@ -123,7 +122,7 @@ namespace Optimizer
                 CurrentPopulation->Position = Position;
                 CurrentPopulation->Velocity = Velocity;
 
-                double Cost = FitnessFunction_(CurrentPopulation->Position);
+                double Cost = ObjectiveFunction_(CurrentPopulation->Position);
                 CurrentPopulation->Cost = Cost;
                 
                 this->AverageCost_ += Cost;
@@ -184,7 +183,7 @@ namespace Optimizer
         double MaximumInertialWeight_ = 0.9f, MinimumInertialWeight_ = 0.4;
         double VelocityFactor_;
 
-        double (*FitnessFunction_)(const std::vector<double> &Position) = nullptr;
+        double (*ObjectiveFunction_)(const std::vector<double> &Position) = nullptr;
 
         std::vector<AParticle> Population_;
         std::vector<double> MaximumVelocity_, MinimumVelocity_;
@@ -195,7 +194,6 @@ namespace Optimizer
         double NextAverageCost_ = 0.0f;
 
         bool Log_;
-
 
         void CalculateAdaptiveInertialWeight (AParticle *CurrentPopulation)
         {
@@ -231,8 +229,8 @@ namespace Optimizer
                 CurrentPopulation->Position[VariableIndex] = NewPosition;
             }
 
-            // Evaluate Fitness Value
-            double Cost = FitnessFunction_(CurrentPopulation->Position);
+            // Evaluate Cost
+            double Cost = ObjectiveFunction_(CurrentPopulation->Position);
             CurrentPopulation->Cost = Cost;
 
             this->NextAverageCost_ += Cost;
@@ -243,7 +241,6 @@ namespace Optimizer
                 CurrentPopulation->BestPosition = CurrentPopulation->Position;
                 CurrentPopulation->BestCost = Cost;
 
-                // This kind of awful!
                 for (int VariableIndex = 0; VariableIndex < this->NVariable_; VariableIndex++)
                 {
                     CurrentPopulation->Feedback[VariableIndex] = (1.0f / static_cast<double>(Iteration)) * CurrentPopulation->Feedback[VariableIndex] +
@@ -268,7 +265,6 @@ namespace Optimizer
                 this->GlobalBestCost_ = Cost;
             }
         }
-
 
         double UpdateVelocity (const AParticle *CurrentPopulation, int VariableIndex)
         {
