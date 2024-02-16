@@ -2,10 +2,6 @@
 // Created by Sippawit Thammawiset on 25/1/2024 AD.
 //
 
-/* TODO:    - Add comments and documentation
- *          - Add more velocity confinements
- */
-
 #ifndef PSO_H
 #define PSO_H
 
@@ -23,6 +19,13 @@ namespace Optimizer
     {
         FAILED = 0,
         SUCCESS = 1
+    };
+
+    enum
+    {
+        RANDOM_BACK = 0,
+        HYPERBOLIC = 1,
+        MIXED = 2
     };
 
     double GenerateRandom (double LowerBound = 0.0f, double UpperBound = 1.0f)
@@ -53,6 +56,7 @@ namespace Optimizer
               int MaximumIteration, int NPopulation, int NVariable,
               double SocialCoefficient = 1.5f, double CognitiveCoefficient = 1.5f,
               double VelocityFactor = 0.5f,
+              int VelocityConfinement = RANDOM_BACK,
               bool Log = true) :
               LowerBound_(LowerBound),
               UpperBound_(UpperBound),
@@ -62,6 +66,7 @@ namespace Optimizer
               SocialCoefficient_(SocialCoefficient),
               CognitiveCoefficient_(CognitiveCoefficient),
               VelocityFactor_(VelocityFactor),
+              VelocityConfinement_(VelocityConfinement),
               Log_(Log)
         {
 
@@ -193,6 +198,7 @@ namespace Optimizer
         double AverageCost_ = 0.0f;
         double NextAverageCost_ = 0.0f;
 
+        int VelocityConfinement_;
         bool Log_;
 
         void CalculateAdaptiveInertialWeight (AParticle *CurrentPopulation)
@@ -278,15 +284,89 @@ namespace Optimizer
             return NewVelocity;
         }
 
+        static double RandomBackConfinement (const double Velocity)
+        {
+            double VelocityConfinement = -GenerateRandom(0.0f, 1.0f) * Velocity;
+
+            return VelocityConfinement;
+        }
+
+        static double HyperbolicConfinement (const double LowerBound,
+                                             const double UpperBound,
+                                             const double Position,
+                                             const double Velocity)
+        {
+            double VelocityConfinement;
+
+            if (Velocity > 0)
+            {
+                VelocityConfinement = Velocity /
+                                      (1.0f + abs(Velocity / (UpperBound - Position)));
+            }
+            else
+            {
+                VelocityConfinement = Velocity /
+                                      (1.0f + abs(Velocity / (Position - LowerBound)));
+            }
+
+            return VelocityConfinement;
+        }
+
+        static double MixedConfinement (const double LowerBound,
+                                        const double UpperBound,
+                                        const double Position,
+                                        const double Velocity)
+        {
+            double VelocityConfinement;
+
+            if (GenerateRandom(0.0f, 1.0) >= 0.5f)
+            {
+                VelocityConfinement = HyperbolicConfinement(LowerBound,
+                                                            UpperBound,
+                                                            Position,
+                                                            Velocity);
+            }
+            else
+            {
+                VelocityConfinement = RandomBackConfinement(Velocity);
+            }
+
+            return VelocityConfinement;
+        }
+
         double UpdatePosition (AParticle *CurrentPopulation, int VariableIndex)
         {
             double TemporaryNewPosition = CurrentPopulation->Position[VariableIndex] + CurrentPopulation->Velocity[VariableIndex];
 
             if (IS_OUT_OF_BOUND(TemporaryNewPosition, this->LowerBound_[VariableIndex], this->UpperBound_[VariableIndex]))
             {
-                double VelocityConfinement = -GenerateRandom(0.0f, 1.0f) * CurrentPopulation->Velocity[VariableIndex];
+                double Confinement;
 
-                CurrentPopulation->Velocity[VariableIndex] = VelocityConfinement;
+                switch (this->VelocityConfinement_)
+                {
+                    case RANDOM_BACK:
+                        Confinement = RandomBackConfinement(CurrentPopulation->Velocity[VariableIndex]);
+
+                        break;
+                    case HYPERBOLIC:
+                        Confinement = HyperbolicConfinement(this->LowerBound_[VariableIndex],
+                                                            this->UpperBound_[VariableIndex],
+                                                            CurrentPopulation->Position[VariableIndex],
+                                                            CurrentPopulation->Velocity[VariableIndex]);
+
+                        break;
+                    case MIXED:
+                        Confinement = MixedConfinement(this->LowerBound_[VariableIndex],
+                                                       this->UpperBound_[VariableIndex],
+                                                       CurrentPopulation->Position[VariableIndex],
+                                                       CurrentPopulation->Velocity[VariableIndex]);
+
+                        break;
+                    default:
+                        Confinement = RandomBackConfinement(CurrentPopulation->Velocity[VariableIndex]);
+                }
+
+                CurrentPopulation->Velocity[VariableIndex] = Confinement;
             }
 
             double NewPosition = CurrentPopulation->Position[VariableIndex] + CurrentPopulation->Velocity[VariableIndex];
