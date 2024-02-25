@@ -148,12 +148,7 @@ namespace Optimizer
             // Optimize
             for (int Iteration = 1; Iteration <= this->MaximumIteration_; Iteration++)
             {
-                for (int PopulationIndex = 0; PopulationIndex < this->NPopulation_; PopulationIndex++)
-                {
-                    auto *CurrentPopulation = &this->Population_[PopulationIndex];
-
-                    Optimize(Iteration, CurrentPopulation);
-                }
+                Optimize(Iteration);
 
                 this->NextAverageCost_ /= this->NPopulation_;
                 this->AverageCost_ = this->NextAverageCost_;
@@ -215,60 +210,65 @@ namespace Optimizer
             }
         }
 
-        void Optimize (int Iteration, AParticle *CurrentPopulation)
+        void Optimize (int Iteration)
         {
-            CalculateAdaptiveInertialWeight(CurrentPopulation);
-
-            // Update Velocity
-            for (int VariableIndex = 0; VariableIndex < this->NVariable_; VariableIndex++)
+            for (int PopulationIndex = 0; PopulationIndex < this->NPopulation_; PopulationIndex++)
             {
-                double NewVelocity = UpdateVelocity(CurrentPopulation, VariableIndex);
+                auto CurrentPopulation = &this->Population_[PopulationIndex];
 
-                CurrentPopulation->Velocity[VariableIndex] = NewVelocity;
-            }
+                CalculateAdaptiveInertialWeight(CurrentPopulation);
 
-            // Update Position
-            for (int VariableIndex = 0; VariableIndex < this->NVariable_; VariableIndex++)
-            {
-                double NewPosition = UpdatePosition(CurrentPopulation, VariableIndex);
-
-                CurrentPopulation->Position[VariableIndex] = NewPosition;
-            }
-
-            // Evaluate Cost
-            double Cost = ObjectiveFunction_(CurrentPopulation->Position);
-            CurrentPopulation->Cost = Cost;
-
-            this->NextAverageCost_ += Cost;
-
-            // Update Previous Best
-            if (Cost < CurrentPopulation->BestCost)
-            {
-                CurrentPopulation->BestPosition = CurrentPopulation->Position;
-                CurrentPopulation->BestCost = Cost;
-
+                // Update Velocity
                 for (int VariableIndex = 0; VariableIndex < this->NVariable_; VariableIndex++)
                 {
-                    CurrentPopulation->Feedback[VariableIndex] = (1.0f / static_cast<double>(Iteration)) * CurrentPopulation->Feedback[VariableIndex] +
-                                                                 (CurrentPopulation->Velocity[VariableIndex]) *
-                                                                 GenerateRandom(0.0f, 1.0f);
+                    double NewVelocity = UpdateVelocity(CurrentPopulation, VariableIndex);
+
+                    CurrentPopulation->Velocity[VariableIndex] = NewVelocity;
                 }
-            }
-            else
-            {
+
+                // Update Position
                 for (int VariableIndex = 0; VariableIndex < this->NVariable_; VariableIndex++)
                 {
-                    CurrentPopulation->Feedback[VariableIndex] = (1.0f / static_cast<double>(Iteration)) * CurrentPopulation->Feedback[VariableIndex] -
-                                                                 (CurrentPopulation->Velocity[VariableIndex]) *
-                                                                 GenerateRandom(0.0f, 1.0f);
-                }
-            }
+                    double NewPosition = UpdatePosition(CurrentPopulation, VariableIndex);
 
-            // Update Global Best
-            if (Cost < this->GlobalBestCost_)
-            {
-                this->GlobalBestPosition_ = CurrentPopulation->Position;
-                this->GlobalBestCost_ = Cost;
+                    CurrentPopulation->Position[VariableIndex] = NewPosition;
+                }
+
+                // Evaluate Cost
+                double Cost = ObjectiveFunction_(CurrentPopulation->Position);
+                CurrentPopulation->Cost = Cost;
+
+                this->NextAverageCost_ += Cost;
+
+                // Update Previous Best
+                if (Cost < CurrentPopulation->BestCost)
+                {
+                    CurrentPopulation->BestPosition = CurrentPopulation->Position;
+                    CurrentPopulation->BestCost = Cost;
+
+                    for (int VariableIndex = 0; VariableIndex < this->NVariable_; VariableIndex++)
+                    {
+                        CurrentPopulation->Feedback[VariableIndex] = (1.0f / static_cast<double>(Iteration)) * CurrentPopulation->Feedback[VariableIndex] +
+                                                                     (CurrentPopulation->Velocity[VariableIndex]) *
+                                                                     GenerateRandom(0.0f, 1.0f);
+                    }
+                }
+                else
+                {
+                    for (int VariableIndex = 0; VariableIndex < this->NVariable_; VariableIndex++)
+                    {
+                        CurrentPopulation->Feedback[VariableIndex] = (1.0f / static_cast<double>(Iteration)) * CurrentPopulation->Feedback[VariableIndex] -
+                                                                     (CurrentPopulation->Velocity[VariableIndex]) *
+                                                                     GenerateRandom(0.0f, 1.0f);
+                    }
+                }
+
+                // Update Global Best
+                if (Cost < this->GlobalBestCost_)
+                {
+                    this->GlobalBestPosition_ = CurrentPopulation->Position;
+                    this->GlobalBestCost_ = Cost;
+                }
             }
         }
 
