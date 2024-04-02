@@ -5,53 +5,76 @@
 #include <iostream>
 
 #include "BenchmarkFunction.h"
-#include "PSO.h"
+#include "IPSO.h"
 
-double GetMean (const std::vector<double> &Sample);
-double GetVariance (const std::vector<double> &Sample);
+/**
+ * @brief A macro to select pre-implemented benchmark function.
+ */
+#define BENCHMARK_NAME  Benchmark::SCHWEFEL_S_2_26
 
-double ObjectiveFunction (const std::vector<double> &Position)
+double GetMean(const std::vector<double> &Sample);
+double GetVariance(const std::vector<double> &Sample);
+
+
+/**
+ * @brief Objective function to be optimized by the algorithm.
+ *
+ * This function defines the objective function to be optimized by the algorithm.
+ * Users should implement their own objective function according to their optimization problem.
+ * The function evaluates the objective function value at a given position.
+ *
+ * @param Position The position vector at which the objective function is to be evaluated.
+ * @return The objective function value or cost at the given position.
+ */
+double ObjectiveFunction(const std::vector<double> &Position)
 {
-    // Define your objective function here
+    // Implement your objective function here
+    // e.g.
+    // for (const auto &i : Position)
+    // {
+    //      Perform calculation on position
+    // }
 
-    return Benchmark::BenchmarkFunction(Benchmark::SCHWEFEL_S_2_26, Position);
+    return Benchmark::BenchmarkFunction(BENCHMARK_NAME, Position);
 }
 
 int main() {
     std::vector<double> LowerBound, UpperBound;
-
     int MaximumIteration, NPopulation, NVariable;
-    double SocialCoefficient = 1.5f, CognitiveCoefficient = 1.5f;
-    double VelocityFactor = 0.5f;
-    int VelocityConfinement = Optimizer::HYPERBOLIC;
+    double SocialCoefficient = 2.0f, CognitiveCoefficient = 1.3f;
+    double VelocityFactor = 0.5f; // Factor for limiting velocity update
+    int VelocityConfinement = MTH::IPSO::VELOCITY_CONFINEMENT::HYPERBOLIC;
 
-    Benchmark::BenchmarkCondition(Benchmark::SCHWEFEL_S_2_26,
-                                  LowerBound, UpperBound,
-                                  MaximumIteration, NPopulation, NVariable);
+    // Get benchmark properties
+    Benchmark::BenchmarkProperty(BENCHMARK_NAME,
+                                 LowerBound, UpperBound,
+                                 MaximumIteration, NPopulation, NVariable);
 
-    int NRun = 30;
+    int NRun = 1; // Number of runs for benchmarking
 
-    // Save the results
+    // Variables for the results
     double Maximum = -INFINITY;
     double Minimum = INFINITY;
     std::vector<double> Sample;
 
+    // Run the algorithm for multiple runs
     for (int Run = 1; Run <= NRun; Run++)
     {
         std::cout << "Run:\t" << Run << std::endl;
 
-        Optimizer::APSO PSO(LowerBound, UpperBound,
-                            MaximumIteration, NPopulation, NVariable,
-                            SocialCoefficient, CognitiveCoefficient,
-                            VelocityFactor,
-                            VelocityConfinement,
-                            false);
+        // Initialize IPSO algorithm
+        MTH::IPSO::AIPSO IPSO(LowerBound, UpperBound,
+                              MaximumIteration, NPopulation, NVariable,
+                              SocialCoefficient, CognitiveCoefficient,
+                              VelocityFactor,
+                              VelocityConfinement,
+                              true);
 
-        PSO.SetObjectiveFunction(ObjectiveFunction);
+        IPSO.SetObjectiveFunction(ObjectiveFunction); // Set objective function for the algorithm
 
-        if (PSO.Run())
+        if (IPSO.Run()) // If the algorithm runs successfully
         {
-            auto GlobalBestPosition = PSO.GetGlobalBestPosition();
+            auto GlobalBestPosition = IPSO.GetGlobalBestPosition();
 
             std::cout << "Global Best Position:\t";
             for (const auto &i : GlobalBestPosition)
@@ -60,7 +83,7 @@ int main() {
             }
             std::cout << std::endl;
 
-            double GlobalBestCost = PSO.GetGlobalBestCost();
+            double GlobalBestCost = IPSO.GetGlobalBestCost();
 
             std::cout << "Global Best Cost:\t" << GlobalBestCost << std::endl;
 
@@ -69,9 +92,9 @@ int main() {
 
             Sample.push_back(GlobalBestCost);
         }
-        else
+        else // If the algorithm fails to run
         {
-            break;
+            break; // Do nothing
         }
 
         std::cout << "------------------------" << std::endl;
@@ -79,12 +102,7 @@ int main() {
 
     std::cout << "Benchmark Result" << std::endl;
 
-    for (const auto &i : Sample)
-    {
-        std::cout << i << "\t";
-    }
-    std::cout << std::endl;
-
+    // Variables for the statistics
     double Mean = GetMean(Sample);
     double Variance = GetVariance(Sample);
     double SD = sqrt(Variance);
@@ -97,27 +115,47 @@ int main() {
     return 0;
 }
 
-double GetMean (const std::vector<double> &Sample)
+/**
+ * @brief Calculate the mean of a sample.
+ *
+ * This function calculates the mean of a given sample of data.
+ *
+ * @param Sample The vector containing the sample data.
+ * @return The mean of the sample.
+ */
+double GetMean(const std::vector<double> &Sample)
 {
     double Sum = 0.0f;
 
+    // Calculate sum of all elements in the sample
     for (const auto &i : Sample)
     {
         Sum += i;
     }
 
-    return Sum / (double)Sample.size();
+    // Return mean
+    return Sum / static_cast<double>(Sample.size());
 }
 
-double GetVariance (const std::vector<double> &Sample)
+/**
+ * @brief Calculate the variance of a sample.
+ *
+ * This function calculates the variance of a given sample of data.
+ *
+ * @param Sample The vector containing the sample data.
+ * @return The variance of the sample.
+ */
+double GetVariance(const std::vector<double> &Sample)
 {
     double Mean = GetMean(Sample);
     double Variance = 0.0f;
 
+    // Calculate squared differences from the mean
     for (const auto &i : Sample)
     {
         Variance += pow(i - Mean, 2);
     }
 
-    return Variance / ((double)Sample.size() - 1);
+    // Return variance
+    return Sample.size() < 2 ? 0.0f : Variance / static_cast<double>(Sample.size() - 1);
 }
