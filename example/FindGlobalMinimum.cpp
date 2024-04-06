@@ -26,7 +26,7 @@ double GetVariance(const std::vector<double> &Sample);
  * @param Position The position vector at which the objective function is to be evaluated.
  * @return The objective function value or cost at the given position.
  */
-double ObjectiveFunction(const std::vector<double> &Position)
+double ObjectiveFunction (const std::vector<double> &Position)
 {
     // Implement your objective function here
     // e.g.
@@ -70,7 +70,8 @@ int main() {
                               VelocityConfinement,
                               true);
 
-        IPSO.SetObjectiveFunction(ObjectiveFunction); // Set objective function for the algorithm
+        // Set objective function for the algorithm
+        IPSO.SetObjectiveFunction(ObjectiveFunction);
 
         if (IPSO.Run()) // If the algorithm runs successfully
         {

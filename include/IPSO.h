@@ -177,6 +177,8 @@ namespace MTH::IPSO
                 for (int VariableIndex = 0; VariableIndex < this->NVariable_; ++VariableIndex)
                 {
                     double RandomPosition = GenerateRandom(this->LowerBound_[VariableIndex], this->UpperBound_[VariableIndex]);
+
+                    // The initialized velocity is derived from Equation (3.4) of "Standard Particle Swarm Optimisation" by Maurice Clerc. Link: https://hal.science/hal-00764996/document
                     double RandomVelocity = (this->LowerBound_[VariableIndex] - RandomPosition) +
                                             GenerateRandom(0.0f, 1.0f) * (this->UpperBound_[VariableIndex] - this->LowerBound_[VariableIndex]);
 
