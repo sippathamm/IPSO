@@ -62,25 +62,41 @@ namespace MTH::IPSO
     }
 
     /**
+     * @brief Generate a random number within a specified range.
+     *
+     * @param LowerBound Lower bound of the range.
+     * @param UpperBound Upper bound of the range.
+     * @return Random number within the specified range.
+     */
+    int GenerateRandom (int LowerBound = 0, int UpperBound = 1)
+    {
+        std::random_device Engine;
+        std::uniform_int_distribution<int> RandomDistribution(LowerBound, UpperBound);
+        return RandomDistribution(Engine);
+    }
+
+    /**
      * @brief A Struct representing a particle in the IPSO algorithm.
      */
-    typedef struct AParticle
+    template <typename T>
+    struct AParticle
     {
         AParticle () : BestCost(2e10), Cost(0.0f) {}
 
-        std::vector<double> Position;
+        std::vector<T> Position;
         std::vector<double> Velocity;
         double Cost;
 
-        std::vector<double> BestPosition;
+        std::vector<T> BestPosition;
         double BestCost;
 
         std::vector<double> Feedback;
-    } AParticle;
+    };
 
     /**
      * @brief A class representing the Improved Particle Swarm Optimization (IPSO) algorithm.
      */
+    template <typename T>
     class AIPSO
     {
     public:
@@ -98,34 +114,37 @@ namespace MTH::IPSO
          * @param VelocityConfinement Type of velocity confinement method.
          * @param Log Flag indicating whether to log information during optimization.
          */
-        inline AIPSO (const std::vector<double> &LowerBound, const std::vector<double> &UpperBound,
-               int MaximumIteration, int NPopulation, int NVariable,
-               double SocialCoefficient = 1.5f, double CognitiveCoefficient = 1.5f,
-               double VelocityFactor = 0.5f,
-               int VelocityConfinement = VELOCITY_CONFINEMENT::RANDOM_BACK,
-               bool Log = true) :
-               LowerBound_(LowerBound),
-               UpperBound_(UpperBound),
-               MaximumIteration_(MaximumIteration),
-               NPopulation_(NPopulation),
-               NVariable_(NVariable),
-               SocialCoefficient_(SocialCoefficient),
-               CognitiveCoefficient_(CognitiveCoefficient),
-               VelocityFactor_(VelocityFactor),
-               VelocityConfinement_(VelocityConfinement),
-               Log_(Log)
+        inline AIPSO <T> (const std::vector<double> &LowerBound, const std::vector<double> &UpperBound,
+                          int MaximumIteration, int NPopulation, int NVariable,
+                          double SocialCoefficient = 1.5f, double CognitiveCoefficient = 1.5f,
+                          double VelocityFactor = 0.5f,
+                          int VelocityConfinement = VELOCITY_CONFINEMENT::RANDOM_BACK,
+                          bool Log = true) :
+                          LowerBound_(LowerBound),
+                          UpperBound_(UpperBound),
+                          MaximumIteration_(MaximumIteration),
+                          NPopulation_(NPopulation),
+                          NVariable_(NVariable),
+                          SocialCoefficient_(SocialCoefficient),
+                          CognitiveCoefficient_(CognitiveCoefficient),
+                          VelocityFactor_(VelocityFactor),
+                          VelocityConfinement_(VelocityConfinement),
+                          Log_(Log)
         {
 
         }
 
-        inline ~AIPSO () = default;
+        /**
+         * @brief Destructor
+         */
+        inline ~AIPSO <T> () = default;
 
         /**
          * @brief Set the objective function for optimization.
          *
          * @param UserObjectiveFunction Pointer to the objective function.
          */
-        void SetObjectiveFunction (double (*UserObjectiveFunction)(const std::vector<double> &Position))
+        void SetObjectiveFunction (double (*UserObjectiveFunction)(const std::vector<T> &Position))
         {
             this->ObjectiveFunction_ = UserObjectiveFunction;
         }
@@ -154,7 +173,7 @@ namespace MTH::IPSO
             }
 
             // Initialize population and velocity bounds
-            this->Population_ = std::vector<AParticle> (this->NPopulation_);
+            this->Population_ = std::vector<AParticle<T>> (this->NPopulation_);
             this->MaximumVelocity_ = std::vector<double> (this->NVariable_);
             this->MinimumVelocity_ = std::vector<double> (this->NVariable_);
 
@@ -170,13 +189,13 @@ namespace MTH::IPSO
             {
                 auto *CurrentPopulation = &this->Population_[PopulationIndex];
 
-                std::vector<double> Position(this->NVariable_);
+                std::vector<T> Position(this->NVariable_);
                 std::vector<double> Velocity(this->NVariable_);
 
                 // Generate random positions and velocities within bounds for each variable
                 for (int VariableIndex = 0; VariableIndex < this->NVariable_; ++VariableIndex)
                 {
-                    double RandomPosition = GenerateRandom(this->LowerBound_[VariableIndex], this->UpperBound_[VariableIndex]);
+                    T RandomPosition = GenerateRandom(this->LowerBound_[VariableIndex], this->UpperBound_[VariableIndex]);
 
                     // The initialized velocity is derived from Equation (3.4) of "Standard Particle Swarm Optimisation" by Maurice Clerc. Link: https://hal.science/hal-00764996/document
                     double RandomVelocity = (this->LowerBound_[VariableIndex] - RandomPosition) +
@@ -223,9 +242,9 @@ namespace MTH::IPSO
 
                 if (this->Log_)
                 {
-                    std::cout << "[INFO] Iteration: " << Iteration << " >>> \n\t"
+                    std::cout << "[INFO] Iteration: " << Iteration << " >>>\t"
                               << "Best Cost: " << this->GlobalBestCost_ <<
-                              std::endl;;
+                              std::endl;
                 }
             }
 
@@ -239,7 +258,7 @@ namespace MTH::IPSO
          *
          * @return Global best position.
          */
-        std::vector<double> GetGlobalBestPosition () const
+        std::vector<T> GetGlobalBestPosition () const
         {
             return this->GlobalBestPosition_;
         }
@@ -255,8 +274,8 @@ namespace MTH::IPSO
         }
 
     private:
-        std::vector<double> LowerBound_; /**< Lower bound of the search space. */
-        std::vector<double> UpperBound_; /**< Upper bound of the search space. */
+        std::vector<T> LowerBound_; /**< Lower bound of the search space. */
+        std::vector<T> UpperBound_; /**< Upper bound of the search space. */
         int MaximumIteration_; /**< Maximum number of iterations. */
         int NPopulation_; /**< Population size. */
         int NVariable_; /**< Number of variables. */
@@ -267,13 +286,13 @@ namespace MTH::IPSO
         double MinimumInertialWeight_ = 0.4f; /**< Minimum value of inertial weight. */
         double VelocityFactor_; /**< Factor for limiting velocity update. */
 
-        double (*ObjectiveFunction_)(const std::vector<double> &Position) = nullptr; /**< Pointer to the objective function. */
+        double (*ObjectiveFunction_)(const std::vector<T> &Position) = nullptr; /**< Pointer to the objective function. */
 
-        std::vector<AParticle> Population_; /**< Vector containing particles. */
+        std::vector<AParticle<T>> Population_; /**< Vector containing particles. */
         std::vector<double> MaximumVelocity_; /**< Vector containing maximum velocity for each variable. */
         std::vector<double> MinimumVelocity_; /**< Vector containing minimum velocity for each variable. */
 
-        std::vector<double> GlobalBestPosition_; /**< Global best position found by the algorithm. */
+        std::vector<T> GlobalBestPosition_; /**< Global best position found by the algorithm. */
         double GlobalBestCost_ = INFINITY; /**< Global best cost found by the algorithm. */
         double AverageCost_ = 0.0f; /**< Average cost of the population. */
         double NextAverageCost_ = 0.0f; /**< Next average cost of the population. */
@@ -306,17 +325,13 @@ namespace MTH::IPSO
                 // Update velocity for each dimension of the particle
                 for (int VariableIndex = 0; VariableIndex < this->NVariable_; ++VariableIndex)
                 {
-                    double NewVelocity = UpdateVelocity(CurrentPopulation, VariableIndex);
-
-                    CurrentPopulation->Velocity[VariableIndex] = NewVelocity;
+                    UpdateVelocity(CurrentPopulation, VariableIndex);
                 }
 
                 // Update position for each dimension of the particle
                 for (int VariableIndex = 0; VariableIndex < this->NVariable_; ++VariableIndex)
                 {
-                    double NewPosition = UpdatePosition(CurrentPopulation, VariableIndex);
-
-                    CurrentPopulation->Position[VariableIndex] = NewPosition;
+                    UpdatePosition(CurrentPopulation, VariableIndex);
                 }
 
                 // Evaluate cost of the updated position for the particle
@@ -376,21 +391,21 @@ namespace MTH::IPSO
          *       The inertia weight adjustment method described here is derived from Equation (8) of their paper.
          *       Link to the paper: https://www.hindawi.com/journals/jr/2023/6619841/
          */
-        void CalculateAdaptiveInertialWeight(AParticle *CurrentPopulation)
+        void CalculateAdaptiveInertialWeight (AParticle<T> *CurrentPopulation)
         {
             if (CurrentPopulation->Cost <= this->AverageCost_)
             {
                 this->InertialWeight_ = this->MinimumInertialWeight_ +
                                         (this->MaximumInertialWeight_ - this->MinimumInertialWeight_) *
                                         ((CurrentPopulation->Cost - this->GlobalBestCost_) /
-                                         (this->AverageCost_ - this->GlobalBestCost_));
+                                        (this->AverageCost_ - this->GlobalBestCost_));
             }
             else
             {
                 this->InertialWeight_ = this->MinimumInertialWeight_ +
                                         (this->MaximumInertialWeight_ - this->MinimumInertialWeight_) *
                                         ((this->AverageCost_ - this->GlobalBestCost_) /
-                                         (CurrentPopulation->Cost - this->GlobalBestCost_));
+                                        (CurrentPopulation->Cost - this->GlobalBestCost_));
             }
         }
 
@@ -406,7 +421,7 @@ namespace MTH::IPSO
          *
          * @return The updated velocity for the specified dimension of the particle.
          */
-        double UpdateVelocity(const AParticle *CurrentPopulation, int VariableIndex)
+        void UpdateVelocity (AParticle<T> *CurrentPopulation, int VariableIndex)
         {
             // Calculate the new velocity
             double NewVelocity = this->InertialWeight_ * CurrentPopulation->Velocity[VariableIndex] +
@@ -417,7 +432,8 @@ namespace MTH::IPSO
             // Clamp the new velocity to stay within specified bounds
             NewVelocity = CLAMP(NewVelocity, this->MinimumVelocity_[VariableIndex], this->MaximumVelocity_[VariableIndex]);
 
-            return NewVelocity;
+            // Update velocity
+            CurrentPopulation->Velocity[VariableIndex] = NewVelocity;
         }
 
         /**
@@ -432,10 +448,10 @@ namespace MTH::IPSO
          *
          * @return The updated position for the specified dimension of the particle.
          */
-        double UpdatePosition(AParticle *CurrentPopulation, int VariableIndex)
+        void UpdatePosition (AParticle<T> *CurrentPopulation, int VariableIndex)
         {
             // Calculate the temporary new position by adding the updated velocity to the current position
-            double TemporaryNewPosition = CurrentPopulation->Position[VariableIndex] + CurrentPopulation->Velocity[VariableIndex];
+            T TemporaryNewPosition = CurrentPopulation->Position[VariableIndex] + CurrentPopulation->Velocity[VariableIndex];
 
             // Apply velocity confinement if the temporary new position is out of bounds
             if (IS_OUT_OF_BOUND(TemporaryNewPosition, this->LowerBound_[VariableIndex], this->UpperBound_[VariableIndex]))
@@ -471,12 +487,13 @@ namespace MTH::IPSO
             }
 
             // Calculate the new position by adding the updated velocity to the current position
-            double NewPosition = CurrentPopulation->Position[VariableIndex] + CurrentPopulation->Velocity[VariableIndex];
+            T NewPosition = CurrentPopulation->Position[VariableIndex] + CurrentPopulation->Velocity[VariableIndex];
 
             // Clamp the new position to stay within specified bounds
             NewPosition = CLAMP(NewPosition, this->LowerBound_[VariableIndex], this->UpperBound_[VariableIndex]);
 
-            return NewPosition;
+            // Update position
+            CurrentPopulation->Position[VariableIndex] = NewPosition;
         }
 
         /**
@@ -510,10 +527,10 @@ namespace MTH::IPSO
          *
          * @return The velocity after applying hyperbolic confinement.
          */
-        static double HyperbolicConfinement(const double LowerBound,
-                                            const double UpperBound,
-                                            const double Position,
-                                            const double Velocity)
+        static double HyperbolicConfinement (const T LowerBound,
+                                             const T UpperBound,
+                                             const double Position,
+                                             const double Velocity)
         {
             double VelocityConfinement;
 
@@ -542,10 +559,10 @@ namespace MTH::IPSO
           *
           * @return The velocity after applying mixed confinement.
           */
-        static double MixedConfinement(const double LowerBound,
-                                       const double UpperBound,
-                                       const double Position,
-                                       const double Velocity)
+        static double MixedConfinement (const T LowerBound,
+                                        const T UpperBound,
+                                        const double Position,
+                                        const double Velocity)
         {
             double VelocityConfinement;
 

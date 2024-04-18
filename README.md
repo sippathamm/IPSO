@@ -67,7 +67,8 @@ The objective function used in this example is a Sphere function.
 #include "IPSO.h"
 
 // Define your objective function here
-double ObjectiveFunction(const std::vector<double> &Position) {
+double ObjectiveFunction (const std::vector<double> &Position) 
+{
     // This function should return the value of the objective function at the given position
     
     double Sum = 0.0f;
@@ -80,7 +81,8 @@ double ObjectiveFunction(const std::vector<double> &Position) {
     return Sum;
 }
 
-int main() {
+int main () 
+{
     // Initialize parameters
     int MaximumIteration = 1000;
     int NPopulation = 50;
@@ -93,12 +95,12 @@ int main() {
     int VelocityConfinement = MTH::IPSO::VELOCITY_CONFINEMENT::HYPERBOLIC;
 
     // Initialize IPSO algorithm
-    MTH::IPSO::AIPSO IPSO(LowerBound, UpperBound,
-                          MaximumIteration, NPopulation, NVariable,
-                          SocialCoefficient, CognitiveCoefficient,
-                          VelocityFactor,
-                          VelocityConfinement,
-                          true);
+    MTH::IPSO::AIPSO<double> IPSO(LowerBound, UpperBound,
+                                  MaximumIteration, NPopulation, NVariable,
+                                  SocialCoefficient, CognitiveCoefficient,
+                                  VelocityFactor,
+                                  VelocityConfinement,
+                                  true);
     
     // Set objective function for the algorithm
     IPSO.SetObjectiveFunction(ObjectiveFunction); 
@@ -108,14 +110,10 @@ int main() {
         auto GlobalBestPosition = IPSO.GetGlobalBestPosition();
 
         std::cout << "Global Best Position:\t";
-        for (const auto &i : GlobalBestPosition)
-        {
-            std::cout << i << "\t";
-        }
+        std::for_each(GlobalBestPosition.begin(), GlobalBestPosition.end(), [](const auto &i) { std::cout << i << "\t"; });
         std::cout << std::endl;
 
         double GlobalBestCost = IPSO.GetGlobalBestCost();
-
         std::cout << "Global Best Cost:\t" << GlobalBestCost << std::endl;
 
         Maximum = std::max(Maximum, GlobalBestCost);
