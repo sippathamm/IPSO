@@ -54,10 +54,10 @@ namespace MTH::IPSO
      * @param UpperBound Upper bound of the range.
      * @return Random number within the specified range.
      */
-    double GenerateRandom (double LowerBound = 0.0f, double UpperBound = 1.0f)
+    double GenerateRandom (double LowerBound = 0.0, double UpperBound = 1.0)
     {
         std::random_device Engine;
-        std::uniform_real_distribution<double> RandomDistribution(0.0f, 1.0f);
+        std::uniform_real_distribution<double> RandomDistribution(0.0, 1.0);
         return LowerBound + RandomDistribution(Engine) * (UpperBound - LowerBound);
     }
 
@@ -81,7 +81,7 @@ namespace MTH::IPSO
     template <typename T>
     struct AParticle
     {
-        AParticle () : BestCost(2e10), Cost(0.0f) {}
+        AParticle () : BestCost(2e10), Cost(0.0) {}
 
         std::vector<T> Position;
         std::vector<double> Velocity;
@@ -116,8 +116,8 @@ namespace MTH::IPSO
          */
         inline AIPSO <T> (const std::vector<double> &LowerBound, const std::vector<double> &UpperBound,
                           int MaximumIteration, int NPopulation, int NVariable,
-                          double SocialCoefficient = 1.5f, double CognitiveCoefficient = 1.5f,
-                          double VelocityFactor = 0.5f,
+                          double SocialCoefficient = 1.5, double CognitiveCoefficient = 1.5,
+                          double VelocityFactor = 0.5,
                           int VelocityConfinement = VELOCITY_CONFINEMENT::RANDOM_BACK,
                           bool Log = true) :
                           LowerBound_(LowerBound),
@@ -199,7 +199,7 @@ namespace MTH::IPSO
 
                     // The initialized velocity is derived from Equation (3.4) of "Standard Particle Swarm Optimisation" by Maurice Clerc. Link: https://hal.science/hal-00764996/document
                     double RandomVelocity = (this->LowerBound_[VariableIndex] - RandomPosition) +
-                                            GenerateRandom(0.0f, 1.0f) * (this->UpperBound_[VariableIndex] - this->LowerBound_[VariableIndex]);
+                                            GenerateRandom(0.0, 1.0) * (this->UpperBound_[VariableIndex] - this->LowerBound_[VariableIndex]);
 
                     Position[VariableIndex] = RandomPosition;
                     Velocity[VariableIndex] = RandomVelocity;
@@ -238,7 +238,7 @@ namespace MTH::IPSO
                 // Update average cost for the next iteration
                 this->NextAverageCost_ /= this->NPopulation_;
                 this->AverageCost_ = this->NextAverageCost_;
-                this->NextAverageCost_ = 0.0f;
+                this->NextAverageCost_ = 0.0;
 
                 if (this->Log_)
                 {
@@ -282,8 +282,8 @@ namespace MTH::IPSO
         double InertialWeight_{}; /**< Current inertial weight. */
         double SocialCoefficient_; /**< Social coefficient for velocity update. */
         double CognitiveCoefficient_; /**< Cognitive coefficient for velocity update. */
-        double MaximumInertialWeight_ = 0.9f; /**< Maximum value of inertial weight. */
-        double MinimumInertialWeight_ = 0.4f; /**< Minimum value of inertial weight. */
+        double MaximumInertialWeight_ = 0.9; /**< Maximum value of inertial weight. */
+        double MinimumInertialWeight_ = 0.4; /**< Minimum value of inertial weight. */
         double VelocityFactor_; /**< Factor for limiting velocity update. */
 
         double (*ObjectiveFunction_)(const std::vector<T> &Position) = nullptr; /**< Pointer to the objective function. */
@@ -294,8 +294,8 @@ namespace MTH::IPSO
 
         std::vector<T> GlobalBestPosition_; /**< Global best position found by the algorithm. */
         double GlobalBestCost_ = INFINITY; /**< Global best cost found by the algorithm. */
-        double AverageCost_ = 0.0f; /**< Average cost of the population. */
-        double NextAverageCost_ = 0.0f; /**< Next average cost of the population. */
+        double AverageCost_ = 0.0; /**< Average cost of the population. */
+        double NextAverageCost_ = 0.0; /**< Next average cost of the population. */
 
         int VelocityConfinement_; /**< Type of velocity confinement method. */
         bool Log_; /**< Flag indicating whether to log information during optimization. */
@@ -350,9 +350,9 @@ namespace MTH::IPSO
                     for (int VariableIndex = 0; VariableIndex < this->NVariable_; ++VariableIndex)
                     {
                         // Equation (7)
-                        CurrentPopulation->Feedback[VariableIndex] = (1.0f / static_cast<double>(Iteration)) * CurrentPopulation->Feedback[VariableIndex] +
+                        CurrentPopulation->Feedback[VariableIndex] = (1.0 / static_cast<double>(Iteration)) * CurrentPopulation->Feedback[VariableIndex] +
                                                                      (CurrentPopulation->Velocity[VariableIndex]) *
-                                                                     GenerateRandom(0.0f, 1.0f);
+                                                                     GenerateRandom(0.0, 1.0);
                     }
                 }
                 else
@@ -360,9 +360,9 @@ namespace MTH::IPSO
                     for (int VariableIndex = 0; VariableIndex < this->NVariable_; ++VariableIndex)
                     {
                         // Equation (8)
-                        CurrentPopulation->Feedback[VariableIndex] = (1.0f / static_cast<double>(Iteration)) * CurrentPopulation->Feedback[VariableIndex] -
+                        CurrentPopulation->Feedback[VariableIndex] = (1.0 / static_cast<double>(Iteration)) * CurrentPopulation->Feedback[VariableIndex] -
                                                                      (CurrentPopulation->Velocity[VariableIndex]) *
-                                                                     GenerateRandom(0.0f, 1.0f);
+                                                                     GenerateRandom(0.0, 1.0);
                     }
                 }
 
@@ -425,8 +425,8 @@ namespace MTH::IPSO
         {
             // Calculate the new velocity
             double NewVelocity = this->InertialWeight_ * CurrentPopulation->Velocity[VariableIndex] +
-                                 this->SocialCoefficient_ * GenerateRandom(0.0f, 1.0f) * (CurrentPopulation->BestPosition[VariableIndex] - CurrentPopulation->Position[VariableIndex]) +
-                                 this->CognitiveCoefficient_ * GenerateRandom(0.0f, 1.0f) * (this->GlobalBestPosition_[VariableIndex] - CurrentPopulation->Position[VariableIndex]) +
+                                 this->SocialCoefficient_ * GenerateRandom(0.0, 1.0) * (CurrentPopulation->BestPosition[VariableIndex] - CurrentPopulation->Position[VariableIndex]) +
+                                 this->CognitiveCoefficient_ * GenerateRandom(0.0, 1.0) * (this->GlobalBestPosition_[VariableIndex] - CurrentPopulation->Position[VariableIndex]) +
                                  CurrentPopulation->Feedback[VariableIndex];
 
             // Clamp the new velocity to stay within specified bounds
@@ -508,7 +508,7 @@ namespace MTH::IPSO
          */
         static double RandomBackConfinement (const double Velocity)
         {
-            double VelocityConfinement = -GenerateRandom(0.0f, 1.0f) * Velocity;
+            double VelocityConfinement = -GenerateRandom(0.0, 1.0) * Velocity;
 
             return VelocityConfinement;
         }
@@ -536,11 +536,11 @@ namespace MTH::IPSO
 
             if (Velocity > 0)
             {
-                VelocityConfinement = Velocity / (1.0f + abs(Velocity / (UpperBound - Position)));
+                VelocityConfinement = Velocity / (1.0 + abs(Velocity / (UpperBound - Position)));
             }
             else
             {
-                VelocityConfinement = Velocity / (1.0f + abs(Velocity / (Position - LowerBound)));
+                VelocityConfinement = Velocity / (1.0 + abs(Velocity / (Position - LowerBound)));
             }
 
             return VelocityConfinement;
@@ -566,7 +566,7 @@ namespace MTH::IPSO
         {
             double VelocityConfinement;
 
-            if (GenerateRandom(0.0f, 1.0) >= 0.5f)
+            if (GenerateRandom(0.0, 1.0) >= 0.5)
             {
                 VelocityConfinement = HyperbolicConfinement(LowerBound, UpperBound, Position, Velocity);
             }

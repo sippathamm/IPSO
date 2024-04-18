@@ -7,13 +7,10 @@
 #include "BenchmarkFunction.h"
 #include "IPSO.h"
 
-/**
- * @brief A macro to select pre-implemented benchmark function.
- */
-#define BENCHMARK_NAME  Benchmark::SCHWEFEL_S_2_26
-
 double GetMean(const std::vector<double> &Sample);
 double GetVariance(const std::vector<double> &Sample);
+
+const double PenaltyScalingFactor = 1000.0;
 
 /**
  * @brief Objective function to be optimized by the algorithm.
@@ -27,28 +24,35 @@ double GetVariance(const std::vector<double> &Sample);
  */
 double ObjectiveFunction (const std::vector<double> &Position)
 {
-    // Implement your objective function here
-    // e.g.
-    // for (const auto &i : Position)
-    // {
-    //      Perform calculation on position
-    // }
+    double X1 = Position[0];
+    double X2 = Position[1];
+    double X3 = Position[2];
 
-    return Benchmark::BenchmarkFunction(BENCHMARK_NAME, Position);
+    double Cost = (X3 + 2) * X2 * X1 * X1;
+    double G1 = 1.0 - (X2 * X2 * X2 * X3) / (71785.0 * X1 * X1 * X1 * X1);
+    double G2 = (4.0 * X2 * X2 - X1 * X2) / (12566.0 * X1 * X1 * X1 * (X2 - X1)) +
+                 1.0 / (5108.0 * X1 * X1) - 1.0;
+    double G3 = 1.0 - 140.45 * X1 / (X2 * X2 * X3);
+    double G4 = (X1 + X2) / 1.5 - 1.0;
+    double Penalty = std::max(0.0, G1) * std::max(0.0, G1) +
+                     std::max(0.0, G2) * std::max(0.0, G2) +
+                     std::max(0.0, G3) * std::max(0.0, G3) +
+                     std::max(0.0, G4) * std::max(0.0, G4);
+
+    return Cost + PenaltyScalingFactor * Penalty;
 }
 
 int main ()
 {
-    std::vector<double> LowerBound, UpperBound;
-    int MaximumIteration, NPopulation, NVariable;
-    double SocialCoefficient = 2.0, CognitiveCoefficient = 1.3;
+    // Initialize parameters
+    int MaximumIteration = 1000;
+    int NPopulation = 50;
+    int NVariable = 3;
+    std::vector<double> LowerBound = std::vector<double> (NVariable) = {0.05, 0.25, 2.0};
+    std::vector<double> UpperBound = std::vector<double> (NVariable) = {2.0, 1.3, 15.0};
+    double SocialCoefficient = 2.5, CognitiveCoefficient = 2.05;
     double VelocityFactor = 0.5; // Factor for limiting velocity update
     int VelocityConfinement = MTH::IPSO::VELOCITY_CONFINEMENT::HYPERBOLIC;
-
-    // Get benchmark properties
-    Benchmark::BenchmarkProperty(BENCHMARK_NAME,
-                                 LowerBound, UpperBound,
-                                 MaximumIteration, NPopulation, NVariable);
 
     int NRun = 30; // Number of runs for benchmarking
 

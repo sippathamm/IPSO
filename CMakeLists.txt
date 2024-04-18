@@ -8,5 +8,5 @@ include_directories(include)
 add_executable(IPSO
         include/BenchmarkFunction.h
         include/IPSO.h
-        example/WeldedBeamDesign.cpp
+        example/TensionCompressionSpringDesign.cpp
 )

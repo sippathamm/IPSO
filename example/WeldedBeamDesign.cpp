@@ -10,29 +10,29 @@
 double GetMean(const std::vector<double> &Sample);
 double GetVariance(const std::vector<double> &Sample);
 
-const double P = 6000.0f;
+const double P = 6000.0;
 const double E = 30e6;
 const double G = 12e6;
-const double L = 14.0f;
+const double L = 14.0;
 
-const double PenaltyScalingFactor = 1000.0f;
-const double TAU_MAX = 13600.0f;
-const double SIGMA_MAX = 30000.0f;
-const double DELTA_MAX = 0.25f;
+const double PenaltyScalingFactor = 1000.0;
+const double TAU_MAX = 13600.0;
+const double SIGMA_MAX = 30000.0;
+const double DELTA_MAX = 0.25;
 
 double Tau (const std::vector<double> &Position)
 {
     double X1 = Position[0];
     double X2 = Position[1];
     double X3 = Position[2];
-    double X13Half = (X1 + X3) * 0.5f;
+    double X13Half = (X1 + X3) * 0.5;
 
-    double M = P * (L + X2 * 0.5f);
+    double M = P * (L + X2 * 0.5);
 //    double R = sqrt((pow(X2, 2)) / 4 + pow((X1 + X3) / 2, 2));
-    double R = sqrt(X2 * X2 * 0.25f + X13Half * X13Half);
-    double J = 2.0f * (sqrt(2.0f) * X1 * X2 * ((X2 * X2) / 12.0f + X13Half * X13Half));
+    double R = sqrt(X2 * X2 * 0.25 + X13Half * X13Half);
+    double J = 2 * (sqrt(2.0) * X1 * X2 * ((X2 * X2) / 12.0 + X13Half * X13Half));
 
-    double Tau1 = P / (sqrt(2.0f) * X1 * X2);
+    double Tau1 = P / (sqrt(2.0) * X1 * X2);
     double Tau2 = M * R / J;
 
     return sqrt(Tau1 * Tau1 + Tau1 * Tau2 * X2 / R + Tau2 * Tau2);
@@ -59,9 +59,9 @@ double PC (const std::vector<double> &Position)
     double X3 = Position[2];
     double X4 = Position[3];
 
-//    double Term1 = 4.013f * E * sqrt((pow(X3, 2) * pow(X4, 6)) / 36);
-    double Term1 = 4.013f * E * X3 * X4 * X4 * X4 / 6;
-    double Term2 = (1.0f - X3 * sqrt(E / (4 * G)) / (2 * L)) / (L * L);
+//    double Term1 = 4.013 * E * sqrt((pow(X3, 2) * pow(X4, 6)) / 36);
+    double Term1 = 4.013 * E * X3 * X4 * X4 * X4 / 6;
+    double Term2 = (1.0 - X3 * sqrt(E / (4 * G)) / (2 * L)) / (L * L);
 
     return Term1 * Term2;
 }
@@ -83,12 +83,12 @@ double ObjectiveFunction (const std::vector<double> &Position)
     double X3 = Position[2];
     double X4 = Position[3];
 
-    double Cost = 1.10471f * X1 * X1 * X2 + 0.04811f * X3 * X4 * (14.0f + X2);
+    double Cost = 1.10471 * X1 * X1 * X2 + 0.04811 * X3 * X4 * (14.0 + X2);
     double G1 = Tau(Position) - TAU_MAX;
     double G2 = Sigma(Position) - SIGMA_MAX;
     double G3 = X1 - X4;
-    double G4 = 0.10471f * X1 * X1 + 0.04811f * X3 * X4 * (14.0f + X2) - 5.0f;
-    double G5 = 0.125f - X1;
+    double G4 = 0.10471 * X1 * X1 + 0.04811 * X3 * X4 * (14.0 + X2) - 5.0;
+    double G5 = 0.125 - X1;
     double G6 = Delta(Position) - DELTA_MAX;
     double G7 = P - PC(Position);
     double Penalty = (std::max(0.0, G1) * std::max(0.0, G1) +
@@ -108,10 +108,10 @@ int main ()
     int MaximumIteration = 1000;
     int NPopulation = 50;
     int NVariable = 4;
-    std::vector<double> LowerBound = std::vector<double> (NVariable) = {0.1f, 0.1f, 0.1f, 0.1f};
-    std::vector<double> UpperBound = std::vector<double> (NVariable) = {2.0f, 10.0f, 10.0f, 2.0f};
-    double SocialCoefficient = 1.5f, CognitiveCoefficient = 1.5f;
-    double VelocityFactor = 0.5f; // Factor for limiting velocity update
+    std::vector<double> LowerBound = std::vector<double> (NVariable) = {0.1, 0.1, 0.1, 0.1};
+    std::vector<double> UpperBound = std::vector<double> (NVariable) = {2.0, 10.0, 10.0, 2.0};
+    double SocialCoefficient = 1.5, CognitiveCoefficient = 1.5;
+    double VelocityFactor = 0.5; // Factor for limiting velocity update
     int VelocityConfinement = MTH::IPSO::VELOCITY_CONFINEMENT::HYPERBOLIC;
 
     int NRun = 30; // Number of runs for benchmarking
@@ -122,7 +122,7 @@ int main ()
     std::vector<double> Sample;
 
     // Run the algorithm for multiple runs
-    for (int Run = 1; Run <= NRun; Run++)
+    for (int Run = 1; Run <= NRun; ++Run)
     {
         std::cout << "-------- " << "Run " << Run << " --------" << std::endl;
 
@@ -201,7 +201,7 @@ double GetMean (const std::vector<double> &Sample)
 double GetVariance (const std::vector<double> &Sample)
 {
     double Mean = GetMean(Sample);
-    double Variance = 0.0f;
+    double Variance = 0.0;
 
     // Calculate squared differences from the mean
     for (const auto &i : Sample)
@@ -209,5 +209,5 @@ double GetVariance (const std::vector<double> &Sample)
         Variance += (i - Mean) * (i - Mean);
     }
 
-    return Sample.size() < 2 ? 0.0f : Variance / static_cast<double>(Sample.size() - 1);
+    return Sample.size() < 2 ? 0.0 : Variance / static_cast<double>(Sample.size() - 1);
 }

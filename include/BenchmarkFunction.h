@@ -25,10 +25,10 @@ namespace Benchmark
         GRIEWANK = 9
     };
 
-    double GenerateRandom (double LowerBound = 0.0f, double UpperBound = 1.0f)
+    double GenerateRandom (double LowerBound = 0.0, double UpperBound = 1.0)
     {
         std::random_device Engine;
-        std::uniform_real_distribution<double> RandomDistribution(0.0f, 1.0f);
+        std::uniform_real_distribution<double> RandomDistribution(0.0, 1.0);
         return LowerBound + RandomDistribution(Engine) * (UpperBound - LowerBound);
     }
 
@@ -36,7 +36,7 @@ namespace Benchmark
     {
         double Sphere (const std::vector<double> &Position)
         {
-            double Sum = 0.0f;
+            double Sum = 0.0;
 
             for (const double &i : Position)
             {
@@ -48,8 +48,8 @@ namespace Benchmark
 
         double Schwefel_s_2_22 (const std::vector<double> &Position)
         {
-            double Term1 = 0.0f;
-            double Term2 = 1.0f;
+            double Term1 = 0.0;
+            double Term2 = 1.0;
 
             for (const double &i : Position)
             {
@@ -64,11 +64,11 @@ namespace Benchmark
         {
             double Sum = 0.0;
 
-            for (int i = 0; i < Position.size(); i++)
+            for (int i = 0; i < Position.size(); ++i)
             {
-                double InnerSum = 0.0f;
+                double InnerSum = 0.0;
 
-                for (int j = 0; j <= i; j++)
+                for (int j = 0; j <= i; ++j)
                 {
                     InnerSum += Position[j];
                 }
@@ -81,9 +81,9 @@ namespace Benchmark
 
         double Rosenbrock (const std::vector<double> &Position)
         {
-            double Sum = 0.0f;
+            double Sum = 0.0;
 
-            for (int i = 0; i < Position.size() - 1; i++)
+            for (int i = 0; i < Position.size() - 1; ++i)
             {
                 double Term1 = 100 * (Position[i + 1] - Position[i] * Position[i]) * (Position[i + 1] - Position[i] * Position[i]);
                 double Term2 = (Position[i] - 1) * (Position[i] - 1);
@@ -100,7 +100,7 @@ namespace Benchmark
 
             for (const double &i : Position)
             {
-                Sum += (i + 0.5f) * (i + 0.5f);
+                Sum += (i + 0.5) * (i + 0.5);
             }
 
             return Sum;
@@ -110,12 +110,12 @@ namespace Benchmark
         {
             double Sum = 0.0f;
 
-            for (int i = 0; i < Position.size(); i++)
+            for (int i = 0; i < Position.size(); ++i)
             {
                 Sum += i * Position[i] * Position[i] * Position[i] * Position[i];
             }
 
-            return Sum + GenerateRandom(0.0f, 1.0f);
+            return Sum + GenerateRandom(0.0, 1.0);
         }
 
         double Schwefel_s_2_26 (const std::vector<double> &Position)
@@ -124,7 +124,7 @@ namespace Benchmark
 
             for (const double &i : Position)
             {
-                Sum += i * sinf(sqrtf(abs(i)));
+                Sum += i * sin(sqrt(abs(i)));
             }
 
             return -Sum;
@@ -136,7 +136,7 @@ namespace Benchmark
 
             for (const double &i : Position)
             {
-                Sum += i * i - 10 * cosf(2.0f * M_PI * i) + 10.0f;
+                Sum += i * i - 10 * cos(2.0 * M_PI * i) + 10.0;
             }
 
             return Sum;
@@ -144,7 +144,7 @@ namespace Benchmark
 
         double Ackley (const std::vector<double> &Position)
         {
-            int Dimension = Position.size();
+            int Dimension = static_cast<int>(Position.size());
 
             double SumSquare = 0.0;
             double SumCosine = 0.0;
@@ -152,13 +152,13 @@ namespace Benchmark
             for (const double &i : Position)
             {
                 SumSquare += i * i;
-                SumCosine += cosf(2.0f * M_PI * i);
+                SumCosine += cos(2.0 * M_PI * i);
             }
 
-            double Term1 = -20.0f * expf(-0.2f * sqrtf(SumSquare / Dimension));
-            double Term2 = -expf(SumCosine / Dimension);
+            double Term1 = -20.0 * exp(-0.2 * sqrt(SumSquare / Dimension));
+            double Term2 = -exp(SumCosine / Dimension);
 
-            return Term1 + Term2 + 20.0f + expf(1.0f);
+            return Term1 + Term2 + 20.0 + expf(1.0);
         }
 
         double Griewank (const std::vector<double> &Position)
@@ -166,9 +166,10 @@ namespace Benchmark
             double SumSquare = 0.0;
             double ProductCosine = 1.0;
 
-            for (int i = 0; i < Position.size(); ++i) {
+            for (int i = 0; i < Position.size(); i++)
+            {
                 SumSquare += Position[i] * Position[i];
-                ProductCosine *= cosf(Position[i] / sqrtf(i + 1));
+                ProductCosine *= cos(Position[i] / sqrt(i + 1));
             }
 
             return SumSquare / 4000 - ProductCosine + 1;
@@ -239,8 +240,8 @@ namespace Benchmark
             NPopulation = 50;
             NVariable = 30;
 
-            LowerBound = std::vector<double> (NVariable, -1.28f);
-            UpperBound = std::vector<double> (NVariable, 1.28f);
+            LowerBound = std::vector<double> (NVariable, -1.28);
+            UpperBound = std::vector<double> (NVariable, 1.28);
         }
 
         void Schwefel_s_2_26 (std::vector<double> &LowerBound, std::vector<double> &UpperBound,
@@ -261,8 +262,8 @@ namespace Benchmark
             NPopulation = 50;
             NVariable = 30;
 
-            LowerBound = std::vector<double> (NVariable, -5.12f);
-            UpperBound = std::vector<double> (NVariable, 5.12f);
+            LowerBound = std::vector<double> (NVariable, -5.12);
+            UpperBound = std::vector<double> (NVariable, 5.12);
         }
 
         void Ackley (std::vector<double> &LowerBound, std::vector<double> &UpperBound,
@@ -320,9 +321,9 @@ namespace Benchmark
         return -1;
     }
 
-    void BenchmarkProperty(FUNCTION_NAME FUNCTION,
-                           std::vector<double> &LowerBound, std::vector<double> &UpperBound,
-                           int &MaximumIteration, int &NPopulation, int &NVariable)
+    void BenchmarkProperty (FUNCTION_NAME FUNCTION,
+                            std::vector<double> &LowerBound, std::vector<double> &UpperBound,
+                            int &MaximumIteration, int &NPopulation, int &NVariable)
     {
         switch (FUNCTION)
         {
