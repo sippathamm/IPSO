@@ -71,7 +71,7 @@ double ObjectiveFunction (const std::vector<double> &Position)
 {
     // This function should return the value of the objective function at the given position
     
-    double Sum = 0.0f;
+    double Sum = 0.0;
 
     for (const double &i : Position)
     {
@@ -89,9 +89,9 @@ int main ()
     int NVariable = 30;
     std::vector<double> LowerBound = std::vector<double> (NVariable, -100);
     std::vector<double> UpperBound = std::vector<double> (NVariable, 100);
-    double SocialCoefficient = 2.0f; // c1
-    double CognitiveCoefficient = 1.3f; // c2
-    double VelocityFactor = 0.5f; // Factor for limiting velocity update
+    double SocialCoefficient = 2.0; // c1
+    double CognitiveCoefficient = 1.3; // c2
+    double VelocityFactor = 0.5; // Factor for limiting velocity update
     int VelocityConfinement = MTH::IPSO::VELOCITY_CONFINEMENT::HYPERBOLIC;
 
     // Initialize IPSO algorithm
