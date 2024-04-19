@@ -76,7 +76,7 @@ namespace MTH::IPSO
     }
 
     /**
-     * @brief A Struct representing a particle in the IPSO algorithm.
+     * @brief A struct representing a particle in the IPSO algorithm.
      */
     template <typename T>
     struct AParticle
@@ -101,7 +101,7 @@ namespace MTH::IPSO
     {
     public:
         /**
-         * @brief Constructor
+         * @brief Constructor.
          *
          * @param LowerBound Lower bound of the search space.
          * @param UpperBound Upper bound of the search space.
@@ -135,7 +135,7 @@ namespace MTH::IPSO
         }
 
         /**
-         * @brief Destructor
+         * @brief Destructor.
          */
         inline ~AIPSO <T> () = default;
 
@@ -306,6 +306,8 @@ namespace MTH::IPSO
          * This function optimizes the IPSO algorithm for the current iteration.
          * It updates the velocity and position of each particle, evaluates the cost of the updated position,
          * updates the best position of each particle, and updates the global best position.
+         *
+         * @param Iteration The current iteration.
          *
          * @note A random positive feedback factor is added into the velocity update formula of the particles, which enhances the ability to find a local optimum.
          *       This information is extracted from the paper "A cubic spline method combing improved particle swarm optimization for robot path planning in dynamic uncertain environment"
