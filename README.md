@@ -115,11 +115,6 @@ int main ()
 
         double GlobalBestCost = IPSO.GetGlobalBestCost();
         std::cout << "Global Best Cost:\t" << GlobalBestCost << std::endl;
-
-        Maximum = std::max(Maximum, GlobalBestCost);
-        Minimum = std::min(Minimum, GlobalBestCost);
-
-        Sample.push_back(GlobalBestCost);
     }
     else // If the algorithm fails to run
     {
