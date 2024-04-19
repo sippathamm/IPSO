@@ -1,4 +1,4 @@
-# Improve Particle Swarm Optimization (IPSO) algorithm
+# Improved Particle Swarm Optimization (IPSO) algorithm
 
 ## Overview
 
