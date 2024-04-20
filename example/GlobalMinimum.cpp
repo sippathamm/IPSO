@@ -39,16 +39,19 @@ double ObjectiveFunction (const std::vector<double> &Position)
 
 int main ()
 {
-    std::vector<double> LowerBound, UpperBound;
-    int MaximumIteration, NPopulation, NVariable;
+    // Initialize parameters
+    int MaximumIteration = 1000;
+    int NPopulation = 50;
     double SocialCoefficient = 2.0, CognitiveCoefficient = 1.3;
     double VelocityFactor = 0.5; // Factor for limiting velocity update
     int VelocityConfinement = MTH::IPSO::VELOCITY_CONFINEMENT::HYPERBOLIC;
 
+    int NVariable;
+    std::vector<double> LowerBound, UpperBound;
+
     // Get benchmark properties
     Benchmark::BenchmarkProperty(BENCHMARK_NAME,
-                                 LowerBound, UpperBound,
-                                 MaximumIteration, NPopulation, NVariable);
+                                 NVariable, LowerBound, UpperBound);
 
     int NRun = 30; // Number of runs for benchmarking
 
