@@ -420,8 +420,6 @@ namespace MTH::IPSO
          *
          * @param CurrentPopulation Pointer to the current particle.
          * @param VariableIndex The index of the dimension for which the velocity is updated.
-         *
-         * @return The updated velocity for the specified dimension of the particle.
          */
         void UpdateVelocity (AParticle<T> *CurrentPopulation, int VariableIndex)
         {
@@ -447,8 +445,6 @@ namespace MTH::IPSO
          *
          * @param CurrentPopulation Pointer to the current particle.
          * @param VariableIndex The index of the dimension for which the position is updated.
-         *
-         * @return The updated position for the specified dimension of the particle.
          */
         void UpdatePosition (AParticle<T> *CurrentPopulation, int VariableIndex)
         {
@@ -549,18 +545,18 @@ namespace MTH::IPSO
         }
 
         /**
-          * @brief Apply mixed velocity confinement.
-          *
-          * This function applies mixed velocity confinement to a given velocity.
-          * It randomly selects between hyperbolic and random back velocity confinement based on a generated random factor.
-          *
-          * @param LowerBound The lower bound for the position (search space).
-          * @param UpperBound The upper bound for the position (search space).
-          * @param Position The current position of the particle.
-          * @param Velocity The velocity to which mixed confinement is applied.
-          *
-          * @return The velocity after applying mixed confinement.
-          */
+         * @brief Apply mixed velocity confinement.
+         *
+         * This function applies mixed velocity confinement to a given velocity.
+         * It randomly selects between hyperbolic and random back velocity confinement based on a generated random factor.
+         *
+         * @param LowerBound The lower bound for the position (search space).
+         * @param UpperBound The upper bound for the position (search space).
+         * @param Position The current position of the particle.
+         * @param Velocity The velocity to which mixed confinement is applied.
+         *
+         * @return The velocity after applying mixed confinement.
+         */
         static double MixedConfinement (const T LowerBound,
                                         const T UpperBound,
                                         const double Position,
