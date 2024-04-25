@@ -10,37 +10,6 @@ The IPSO algorithm is a variant of the Particle Swarm Optimization (PSO) algorit
 - Easy-to-use interface for optimizing user-defined objective functions.
 - Customizable parameters for fine-tuning the optimization process.
 - Example code demonstrating the usage of the IPSO algorithm for solving optimization problems.
-
-## Getting Started
-
-Follow these steps to get started with the IPSO algorithm:
-
-1. **Clone the Repository**: Clone this repository to your local machine using the following command:
-
-    ```bash
-    git clone https://github.com/sippathamm/IPSO.git
-    ```
-
-2. **Build the Project**: Navigate to the root directory and create a build directory. Then, run CMake to configure the project and generate build files:
-
-    ```bash
-    cd IPSO
-    mkdir build
-    cmake -S . -B build
-    ```
-
-3. **Compile the Code**: Once the build files are generated, build the IPSO executable by running:
-
-    ```bash
-    cmake --build build --target IPSO
-    ```
-
-4. **Run the Executable**: Execute the IPSO algorithm by navigating to the build directory and running the generated executable:
-
-    ```bash
-    cd build
-    ./IPSO
-    ```
    
 ## Usage
 
